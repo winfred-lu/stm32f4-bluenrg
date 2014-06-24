@@ -17,7 +17,6 @@ CFLAGS += -mcpu=cortex-m4 -march=armv7e-m -mtune=cortex-m4
 CFLAGS += -mlittle-endian -mthumb
 
 # C libraries
-LIBS = -lc -lnosys
 define get_library_path
     $(shell dirname $(shell $(CC) $(CFLAGS) -print-file-name=$(1)))
 endef
@@ -34,24 +33,52 @@ CFLAGS += \
 	-I$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Inc
 
 %.bin: %.elf
-	$(OBJCOPY) -O binary $^ $@
-	$(OBJDUMP) -h -S -D $^ > $(basename $^).lst
+ifeq ($(V), 1)
+	$(OBJCOPY) -O binary $< $@
+	$(OBJDUMP) -h -S -D $< > $(basename $^).lst
 	$(SIZE) $^
+else
+	@$(OBJCOPY) -O binary $< $@
+	@$(OBJDUMP) -h -S -D $< > $(basename $^).lst
+	@echo "SIZE  $<"
+	@$(SIZE) $<
+endif
 
 .PRECIOUS: %.elf
 
 %.elf: $(OBJS)
-	$(LD) -o $@ $(OBJS)  --start-group $(LIBS) --end-group $(LDFLAGS)
+ifeq ($(V), 1)
+	$(LD) -o $@ $(OBJS) $(LDFLAGS)
+else
+	@echo "LD  $@"
+	@$(LD) -o $@ $(OBJS) $(LDFLAGS)
+endif
 
 %.o: %.c
+ifeq ($(V), 1)
 	$(CC) $(CFLAGS) -c $< -o $@
+else
+	@echo "CC  $<"
+	@$(CC) $(CFLAGS) -c $< -o $@
+endif
 
 %.o: %.s
+ifeq ($(V), 1)
 	$(CC) $(CFLAGS) -c $< -o $@
+else
+	@echo "AS  $<"
+	@$(CC) $(CFLAGS) -c $< -o $@
+endif
 
 clean:
+ifeq ($(V), 1)
 	rm -f *.elf *.bin *.lst
 	find . -name \*.o -delete
+else
+	@rm -f *.elf *.bin *.lst
+	@find . -name \*.o -delete
+	@echo Objects deleted.
+endif
 
 flash:
 	openocd -f interface/stlink-v2.cfg -f target/stm32f4x_stlink.cfg \
