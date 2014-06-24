@@ -1,0 +1,65 @@
+ROOT_DIR = .
+
+# Toolchain configurations
+CROSS_COMPILE ?= arm-none-eabi-
+CC = $(CROSS_COMPILE)gcc
+LD = $(CROSS_COMPILE)ld
+OBJCOPY = $(CROSS_COMPILE)objcopy
+OBJDUMP = $(CROSS_COMPILE)objdump
+SIZE = $(CROSS_COMPILE)size
+
+# Basic configurations
+CFLAGS = -g -std=c99
+CFLAGS += -Wall
+
+# Cortex-M4 implements the ARMv7E-M architecture
+CFLAGS += -mcpu=cortex-m4 -march=armv7e-m -mtune=cortex-m4
+CFLAGS += -mlittle-endian -mthumb
+
+# C libraries
+LIBS = -lc -lnosys
+define get_library_path
+    $(shell dirname $(shell $(CC) $(CFLAGS) -print-file-name=$(1)))
+endef
+LDFLAGS += -L $(call get_library_path,libc.a)
+LDFLAGS += -L $(call get_library_path,libgcc.a)
+
+# Definitions for library usage
+CFLAGS += -DUSE_STDPERIPH_DRIVER
+
+# CMSIS and STM32F4 libraries
+CFLAGS += \
+	-I$(ROOT_DIR)/Drivers/CMSIS/Device/ST/STM32F4xx/Include \
+	-I$(ROOT_DIR)/Drivers/CMSIS/Include \
+	-I$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Inc
+
+%.bin: %.elf
+	$(OBJCOPY) -O binary $^ $@
+	$(OBJDUMP) -h -S -D $^ > $(basename $^).lst
+	$(SIZE) $^
+
+.PRECIOUS: %.elf
+
+%.elf: $(OBJS)
+	$(LD) -o $@ $(OBJS)  --start-group $(LIBS) --end-group $(LDFLAGS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+%.o: %.s
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -f *.elf *.bin *.lst
+	find . -name \*.o -delete
+
+flash:
+	openocd -f interface/stlink-v2.cfg -f target/stm32f4x_stlink.cfg \
+	-c "init" \
+	-c "reset init" \
+	-c "flash probe 0" \
+	-c "flash info 0" \
+	-c "flash write_image erase sensor.bin 0x8000000" \
+	-c "reset run" -c shutdown
+
+.PHONY: clean
