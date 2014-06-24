@@ -26,17 +26,17 @@
   */
 #include "stm32f4xx_hal.h"
 
-static void hw_init(void)
+static void HW_Init(void)
 {
-	GPIO_InitTypeDef GPIO_InitStruct;
+  GPIO_InitTypeDef GPIO_InitStruct;
 
-	/* STM32F401 discovery LEDs */
-	__GPIOD_CLK_ENABLE();
-	GPIO_InitStruct.Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_PULLUP;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
-	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+  /* STM32F401 discovery LEDs */
+  __GPIOD_CLK_ENABLE();
+  GPIO_InitStruct.Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 }
 
 /**
@@ -46,20 +46,20 @@ static void hw_init(void)
   */
 int main(void)
 {
-	HAL_Init();
+  HAL_Init();
+  HW_Init();
 
-	hw_init();
-
-	while (1) {
-		/* Blink the orange LED */
-		HAL_Delay(500);
-		HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
-	}
+  while (1)
+  {
+    /* Blink the orange LED */
+    HAL_Delay(500);
+    HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
+  }
 }
 
 void SysTick_Handler(void)
 {
-	HAL_IncTick();
+  HAL_IncTick();
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
