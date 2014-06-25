@@ -26,6 +26,15 @@
   */
 #include "stm32f4xx_hal.h"
 
+#ifdef WITH_VCP
+#include "usbd_core.h"
+#include "usbd_cdc.h"
+#include "usbd_cdc_interface.h"
+#include "usbd_desc.h"
+
+USBD_HandleTypeDef hUSBDDevice;
+#endif
+
 static void HW_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct;
@@ -37,6 +46,20 @@ static void HW_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+#ifdef WITH_VCP
+  /* Init Device Library */
+  USBD_Init(&hUSBDDevice, &VCP_Desc, 0);
+
+  /* Add Supported Class */
+  USBD_RegisterClass(&hUSBDDevice, &USBD_CDC);
+
+  /* Add CDC Interface Class */
+  USBD_CDC_RegisterInterface(&hUSBDDevice, &USBD_CDC_fops);
+
+  /* Start Device Process */
+  USBD_Start(&hUSBDDevice);
+#endif
 }
 
 /**

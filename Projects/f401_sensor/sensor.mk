@@ -1,17 +1,37 @@
 SNSR_DIR = $(ROOT_DIR)/Projects/f401_sensor
 
 SNSR_LDFLAGS = -T $(SNSR_DIR)/stm32f401vc_flash.ld
-
 SNSR_CFLAGS = -DSTM32F401xC -I$(SNSR_DIR)
 
 SNSR_OBJS = \
 	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o \
 	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o \
 	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.o \
+	$(SNSR_DIR)/main.o \
+	$(SNSR_DIR)/newlib_stubs.o \
 	$(SNSR_DIR)/startup_stm32f401xc.o \
-	$(SNSR_DIR)/system_stm32f4xx.o \
-	$(SNSR_DIR)/main.o
+	$(SNSR_DIR)/system_stm32f4xx.o
 
+ifeq ($(WITH_VCP), 1)
+SNSR_CFLAGS += -DWITH_VCP \
+	-I$(ROOT_DIR)/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc \
+	-I$(ROOT_DIR)/Middlewares/ST/STM32_USB_Device_Library/Core/Inc
+SNSR_OBJS += \
+	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.o \
+	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.o \
+	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.o \
+	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.o \
+	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.o \
+	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.o \
+	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.o \
+	$(ROOT_DIR)/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.o \
+	$(ROOT_DIR)/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.o \
+	$(ROOT_DIR)/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.o \
+	$(ROOT_DIR)/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.o \
+	$(SNSR_DIR)/usbd_conf.o \
+	$(SNSR_DIR)/usbd_cdc_interface.o \
+	$(SNSR_DIR)/usbd_desc.o
+endif
 
 sensor: LDFLAGS += $(SNSR_LDFLAGS)
 sensor: CFLAGS += $(SNSR_CFLAGS)
