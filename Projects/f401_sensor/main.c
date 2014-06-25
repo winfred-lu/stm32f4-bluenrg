@@ -25,6 +25,8 @@
   ******************************************************************************
   */
 #include "stm32f4xx_hal.h"
+#include "stm32f401_discovery.h"
+#include "stm32f401_discovery_accelerometer.h"
 
 #ifdef WITH_VCP
 #include "usbd_core.h"
@@ -37,15 +39,18 @@ USBD_HandleTypeDef hUSBDDevice;
 
 static void HW_Init(void)
 {
-  GPIO_InitTypeDef GPIO_InitStruct;
+  /* Init STM32F401 discovery LEDs */
+  BSP_LED_Init(LED3);
+  BSP_LED_Init(LED4);
+  BSP_LED_Init(LED5);
+  BSP_LED_Init(LED6);
 
-  /* STM32F401 discovery LEDs */
-  __GPIOD_CLK_ENABLE();
-  GPIO_InitStruct.Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+  /* Init SPI and I2C */
+  GYRO_IO_Init();
+  COMPASSACCELERO_IO_Init();
+
+  /* Init on-board AccelMag */
+  BSP_ACCELERO_Init();
 
 #ifdef WITH_VCP
   /* Init Device Library */
@@ -69,6 +74,8 @@ static void HW_Init(void)
   */
 int main(void)
 {
+  int16_t accData[3];
+
   HAL_Init();
   HW_Init();
 
@@ -77,6 +84,8 @@ int main(void)
     /* Blink the orange LED */
     HAL_Delay(500);
     HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
+
+    BSP_ACCELERO_GetXYZ(accData);
   }
 }
 

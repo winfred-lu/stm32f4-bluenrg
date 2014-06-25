@@ -1,12 +1,21 @@
 SNSR_DIR = $(ROOT_DIR)/Projects/f401_sensor
 
 SNSR_LDFLAGS = -T $(SNSR_DIR)/stm32f401vc_flash.ld
-SNSR_CFLAGS = -DSTM32F401xC -I$(SNSR_DIR)
+
+SNSR_CFLAGS = -DSTM32F401xC -I$(SNSR_DIR) \
+	-I$(ROOT_DIR)/Drivers/BSP/STM32F401-Discovery
 
 SNSR_OBJS = \
+	$(ROOT_DIR)/Drivers/BSP/STM32F401-Discovery/stm32f401_discovery.o \
+	$(ROOT_DIR)/Drivers/BSP/STM32F401-Discovery/stm32f401_discovery_accelerometer.o \
+	$(ROOT_DIR)/Drivers/BSP/Components/lsm303dlhc/lsm303dlhc.o \
 	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o \
 	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o \
+	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.o \
 	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.o \
+	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.o \
+	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.o \
+	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.o \
 	$(SNSR_DIR)/main.o \
 	$(SNSR_DIR)/newlib_stubs.o \
 	$(SNSR_DIR)/startup_stm32f401xc.o \
@@ -17,9 +26,7 @@ SNSR_CFLAGS += -DWITH_VCP \
 	-I$(ROOT_DIR)/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc \
 	-I$(ROOT_DIR)/Middlewares/ST/STM32_USB_Device_Library/Core/Inc
 SNSR_OBJS += \
-	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.o \
 	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.o \
-	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.o \
 	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.o \
 	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.o \
 	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.o \

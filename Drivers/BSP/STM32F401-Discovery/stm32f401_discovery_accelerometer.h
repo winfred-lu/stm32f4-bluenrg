@@ -4,7 +4,7 @@
   * @author  MCD Application Team
   * @version V2.0.0
   * @date    18-February-2014
-  * @brief   This file contains definitions for stm32f401_discovery_accelerometer.c 
+  * @brief   This file contains definitions for stm32f401_discovery_accelerometer.c
   *          firmware driver.
   ******************************************************************************
   * @attention
@@ -35,7 +35,7 @@
   *
   ******************************************************************************
   */
-  
+
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __STM32F401_DISCOVERY_ACCELERO_H
@@ -48,20 +48,20 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f401_discovery.h"
 /* Include Gyroscope component driver */
-#include "..\Components\lsm303dlhc\lsm303dlhc.h"
-   
+#include "../Components/lsm303dlhc/lsm303dlhc.h"
+
 /** @addtogroup BSP
   * @{
   */
-  
+
 /** @addtogroup STM32F401_DISCOVERY
   * @{
-  */ 
+  */
 
 /** @addtogroup STM32F401_DISCOVERY_ACCELERO
   * @{
   */
-  
+
 /** @defgroup STM32F401_DISCOVERY_ACCELERO_Exported_Types STM32F401_DISCOVERY_ACCELERO_Exported_Types
   * @{
   */
@@ -73,22 +73,22 @@
 /** @defgroup STM32F401_DISCOVERY_ACCELERO_Exported_Constants STM32F401_DISCOVERY_ACCELERO_Exported_Constants
   * @{
   */
-typedef enum 
+typedef enum
 {
   ACCELERO_OK = 0,
   ACCELERO_ERROR = 1,
   ACCELERO_TIMEOUT = 2
-} 
+}
 ACCELERO_StatusTypeDef;
 
 /**
   * @}
   */
-  
+
 /** @defgroup STM32F401_DISCOVERY_ACCELERO_Exported_Functions STM32F401_DISCOVERY_ACCELERO_Exported_Functions
   * @{
   */
-/* Acc functions */  
+/* Acc functions */
 uint8_t   BSP_ACCELERO_Init(void);
 void      BSP_ACCELERO_Reset(void);
 void      BSP_ACCELERO_Click_ITConfig(void);
@@ -104,11 +104,11 @@ void      BSP_ACCELERO_GetXYZ(int16_t* pDataXYZ);
 
 /**
   * @}
-  */ 
+  */
 
 /**
   * @}
-  */ 
+  */
 #endif /* __STM32F401_DISCOVERY_ACCELERO_H */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/ 
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
