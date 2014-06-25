@@ -40,7 +40,7 @@ USBD_HandleTypeDef hUSBDDevice;
 #ifdef WITH_USART
 USART_HandleTypeDef UsartHandle;
 
-void HAL_UART_MspInit(UART_HandleTypeDef *huart)
+void HAL_USART_MspInit(USART_HandleTypeDef *huart)
 {
   GPIO_InitTypeDef  GPIO_InitStruct;
 
@@ -132,8 +132,7 @@ int main(void)
 {
   int16_t accData[3];
 #ifdef WITH_USART
-  uint8_t aTxBuf[4] = {0};
-  aTxBuf[0] = '0';
+  uint8_t msg[3] = {'0', '\r', '\n'};
 #endif
 
   HAL_Init();
@@ -148,9 +147,8 @@ int main(void)
     BSP_ACCELERO_GetXYZ(accData);
 
 #ifdef WITH_USART
-    if (++aTxBuf[0] > '9')
-      aTxBuf[0] = '0';
-    if (HAL_USART_Transmit_IT(&UsartHandle, (uint8_t*)aTxBuf, 4) != HAL_OK)
+    if (++msg[0] > '9') msg[0] = '0';
+    if (HAL_USART_Transmit(&UsartHandle, msg, 3, 5000) != HAL_OK)
       ColorfulRingOfDeath();
 #endif
   }
