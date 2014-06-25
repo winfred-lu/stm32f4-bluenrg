@@ -37,6 +37,47 @@
 USBD_HandleTypeDef hUSBDDevice;
 #endif
 
+#ifdef WITH_USART
+USART_HandleTypeDef UsartHandle;
+
+void HAL_UART_MspInit(UART_HandleTypeDef *huart)
+{
+  GPIO_InitTypeDef  GPIO_InitStruct;
+
+  /* Enable GPIO TX/RX and USART clock */
+  __GPIOA_CLK_ENABLE();
+  __USART2_CLK_ENABLE();
+
+  /* USART TX/RX GPIO pin configuration  */
+  GPIO_InitStruct.Pin       = GPIO_PIN_2 | GPIO_PIN_3;
+  GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull      = GPIO_NOPULL;
+  GPIO_InitStruct.Speed     = GPIO_SPEED_FAST;
+  GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /* NVIC for USART */
+  HAL_NVIC_SetPriority(USART2_IRQn, 0, 1);
+  HAL_NVIC_EnableIRQ(USART2_IRQn);
+}
+
+static void ColorfulRingOfDeath(void)
+{
+  uint16_t ring = 1;
+  while (1)
+  {
+    uint32_t count = 0;
+    while (count++ < 100000)
+      ;
+    GPIOD->BSRRH = (ring << 12);
+    ring = ring << 1;
+    if (ring >= 1<<4)
+      ring = 1;
+    GPIOD->BSRRL = (ring << 12);
+  }
+}
+#endif
+
 static void HW_Init(void)
 {
   /* Init STM32F401 discovery LEDs */
@@ -51,6 +92,21 @@ static void HW_Init(void)
 
   /* Init on-board AccelMag */
   BSP_ACCELERO_Init();
+
+#ifdef WITH_USART
+  UsartHandle.Instance        = USART2;
+  UsartHandle.Init.BaudRate   = 9600;
+  UsartHandle.Init.WordLength = USART_WORDLENGTH_8B;
+  UsartHandle.Init.StopBits   = USART_STOPBITS_1;
+  UsartHandle.Init.Parity     = USART_PARITY_NONE;
+  UsartHandle.Init.Mode       = USART_MODE_TX_RX;
+
+  /* Init Device Library */
+  if (HAL_USART_Init(&UsartHandle) != HAL_OK)
+  {
+    ColorfulRingOfDeath();
+  }
+#endif
 
 #ifdef WITH_VCP
   /* Init Device Library */
@@ -75,6 +131,10 @@ static void HW_Init(void)
 int main(void)
 {
   int16_t accData[3];
+#ifdef WITH_USART
+  uint8_t aTxBuf[4] = {0};
+  aTxBuf[0] = '0';
+#endif
 
   HAL_Init();
   HW_Init();
@@ -86,6 +146,13 @@ int main(void)
     HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
 
     BSP_ACCELERO_GetXYZ(accData);
+
+#ifdef WITH_USART
+    if (++aTxBuf[0] > '9')
+      aTxBuf[0] = '0';
+    if (HAL_USART_Transmit_IT(&UsartHandle, (uint8_t*)aTxBuf, 4) != HAL_OK)
+      ColorfulRingOfDeath();
+#endif
   }
 }
 

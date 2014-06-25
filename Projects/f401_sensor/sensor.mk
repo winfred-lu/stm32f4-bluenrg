@@ -21,6 +21,19 @@ SNSR_OBJS = \
 	$(SNSR_DIR)/startup_stm32f401xc.o \
 	$(SNSR_DIR)/system_stm32f4xx.o
 
+
+ifeq ($(WITH_USART) $(WITH_VCP), 1 1)
+$(error Both USART and VCP are enabled, please choose only one of them)
+endif
+
+# USART2 support
+ifeq ($(WITH_USART), 1)
+SNSR_CFLAGS += -DWITH_USART
+SNSR_OBJS += \
+	$(ROOT_DIR)/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_usart.o
+endif
+
+# USB virtual com port support
 ifeq ($(WITH_VCP), 1)
 SNSR_CFLAGS += -DWITH_VCP \
 	-I$(ROOT_DIR)/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc \
