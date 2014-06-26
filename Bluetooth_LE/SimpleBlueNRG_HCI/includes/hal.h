@@ -23,8 +23,9 @@
 #include <hal_types.h>
 #include <ble_status.h>
 
-#if defined  (STM32L1XX_MD) || (STM32L1XX_XL) 
+#if defined  (STM32L1XX_MD) || (STM32L1XX_XL)
 #include "SDK_EVAL_Config.h"
+#elif defined (STM32F401xC)
 #else
 #include "SDK_EVAL_Spi_Driver.h"
 #endif
@@ -45,7 +46,7 @@
                                             *((tHalUint8 *)ptr + 2) << 16) | \
                                            ((tHalUint32) \
                                             *((tHalUint8 *)ptr + 3) << 24) )
-											
+
 /* Store Value into a buffer in Little Endian Format */
 #define HOST_TO_LE_16(buf, val)    ( ((buf)[0] =  (tHalUint8) (val)    ) , \
                                    ((buf)[1] =  (tHalUint8) (val>>8) ) )
@@ -53,8 +54,8 @@
 #define HOST_TO_LE_32(buf, val)    ( ((buf)[0] =  (tHalUint8) (val)     ) , \
                                    ((buf)[1] =  (tHalUint8) (val>>8)  ) , \
                                    ((buf)[2] =  (tHalUint8) (val>>16) ) , \
-                                   ((buf)[3] =  (tHalUint8) (val>>24) ) ) 
- 
+                                   ((buf)[3] =  (tHalUint8) (val>>24) ) )
+
 /******************************************************************************
  * Types
  *****************************************************************************/
