@@ -48,11 +48,15 @@
 #endif
 
 #define HCI_LOG_ON 0
-
 #define HCI_READ_PACKET_NUM_MAX 		 (5)
 
 #define MIN(a,b)            ((a) < (b) )? (a) : (b)
 #define MAX(a,b)            ((a) > (b) )? (a) : (b)
+
+/* winfred FIXME */
+#define Disable_SPI_IRQ()
+#define Enable_SPI_IRQ()
+#define Clear_SPI_EXTI_Flag()
 
 static void enqueue_packet(tHciDataPacket * hciReadPacket);
 
@@ -197,9 +201,9 @@ void HCI_Process(void)
     }
     if (readPacketListFull) {
       while(BlueNRG_DataPresent()) {
-	data_len = BlueNRG_SPI_Read_All(buffer, HCI_PACKET_SIZE);
-	if(data_len > 0)
-	  HCI_Event_CB(buffer);
+        data_len = BlueNRG_SPI_Read_All(buffer, HCI_PACKET_SIZE);
+        if(data_len > 0)
+          HCI_Event_CB(buffer);
       }
       readPacketListFull = FALSE;
     }
@@ -211,18 +215,18 @@ void HCI_Isr(void)
 {
   tHciDataPacket * hciReadPacket = NULL;
   uint8_t data_len;
-    
+
   Clear_SPI_EXTI_Flag();
-  while(SdkEvalSPI_Irq_Pin()){        
+  while (BlueNRG_DataPresent()) {
     if (list_is_empty (&hciReadPktPool) == FALSE){
-            
+
       /* enqueueing a packet for read */
       list_remove_head (&hciReadPktPool, (tListNode **)&hciReadPacket);
-            
+
       data_len = BlueNRG_SPI_Read_All(hciReadPacket->dataBuff,HCI_PACKET_SIZE);
-      if(data_len > 0){                    
+      if(data_len > 0){
 	HCI_Input(hciReadPacket);
-	// Packet will be inserted to te correct queue by 
+	// Packet will be inserted to te correct queue by
       }
       else {
 	// Insert the packet back into the pool.
@@ -241,17 +245,18 @@ void HCI_Isr(void)
   }
 }
 
-void hci_write(const void* data1, const void* data2, uint32_t n_bytes1, uint32_t n_bytes2){
+void hci_write(void* data1, void* data2, uint32_t n_bytes1, uint32_t n_bytes2)
+{
 #if  HCI_LOG_ON
     PRINTF("HCI <- ");
     for(int i=0; i < n_bytes1; i++)
         PRINTF("%02X ", *((uint8_t*)data1 + i));
     for(int i=0; i < n_bytes2; i++)
         PRINTF("%02X ", *((uint8_t*)data2 + i));
-    PRINTF("\n");    
+    PRINTF("\n");
 #endif
-        
-	Hal_Write_Serial(data1, data2, n_bytes1, n_bytes2);
+
+	BlueNRG_SPI_Write(data1, data2, n_bytes1, n_bytes2);
 }
 
 int hci_send_cmd(uint16_t ogf, uint16_t ocf, uint8_t plen, void *param)
@@ -287,8 +292,8 @@ int hci_send_req(struct hci_request *r)
 	hci_event_pckt *event_pckt;
 	hci_uart_pckt *hci_hdr;
 	int try;
-    int to = DEFAULT_TIMEOUT;
-    
+    int to = 10; /* DEFAULT_TIMEOUT */
+
 	new_packet = FALSE;
 	hci_set_packet_complete_callback(new_hci_event);
 	if (hci_send_cmd(r->ogf, r->ocf, r->clen, r->cparam) < 0)
@@ -304,22 +309,25 @@ int hci_send_req(struct hci_request *r)
         /* Minimum timeout is 1. */
         if(to == 0)
             to = 1;
-        
+
 		if (to > 0) {
+            /* winfred FIXME
 			struct timer t;
-            
 			Timer_Set(&t, to);
-            
+            */
+
 			while(1){
+                /* winfred FIXME
 				if(Timer_Expired(&t)){
 					goto failed;
 				}
+                */
 				if(new_packet){
 					break;
 				}
 			}
 		}
-        
+
 		hci_hdr = (void *)hci_buffer;
 		if(hci_hdr->type != HCI_EVENT_PKT){
             new_packet = FALSE;

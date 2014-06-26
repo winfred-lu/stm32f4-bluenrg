@@ -3,6 +3,7 @@ SNSR_DIR = $(ROOT_DIR)/Projects/f401_sensor
 SNSR_LDFLAGS = -T $(SNSR_DIR)/stm32f401vc_flash.ld
 
 SNSR_CFLAGS = -DSTM32F401xC -I$(SNSR_DIR) \
+	-I$(ROOT_DIR)/Drivers/BSP/Components/lsm303dlhc \
 	-I$(ROOT_DIR)/Drivers/BSP/STM32F401-Discovery
 
 SNSR_OBJS = \
@@ -20,6 +21,15 @@ SNSR_OBJS = \
 	$(SNSR_DIR)/newlib_stubs.o \
 	$(SNSR_DIR)/startup_stm32f401xc.o \
 	$(SNSR_DIR)/system_stm32f4xx.o
+
+# Bluetooth low energy objects
+BLE_DIR = $(ROOT_DIR)/Bluetooth_LE/SimpleBlueNRG_HCI
+SNSR_CFLAGS += -I$(BLE_DIR)/includes
+SNSR_OBJS += \
+	$(BLE_DIR)/hci/hci.o \
+	$(BLE_DIR)/hci/controller/bluenrg_hci.o \
+	$(BLE_DIR)/utils/list.o \
+	$(SNSR_DIR)/gatt_db.o
 
 ifeq ($(WITH_VCP), 1)
 SNSR_CFLAGS += -DWITH_VCP \

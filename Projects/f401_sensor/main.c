@@ -28,6 +28,9 @@
 #include "stm32f401_discovery.h"
 #include "stm32f401_discovery_accelerometer.h"
 
+#include "hci_internal.h"
+#include "bluenrg_hci_internal.h"
+
 #ifdef WITH_VCP
 #include "usbd_core.h"
 #include "usbd_cdc.h"
@@ -74,18 +77,15 @@ static void HW_Init(void)
   */
 int main(void)
 {
-  int16_t accData[3];
-
   HAL_Init();
   HW_Init();
+  HCI_Init();
 
   while (1)
   {
     /* Blink the orange LED */
     HAL_Delay(500);
     HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
-
-    BSP_ACCELERO_GetXYZ(accData);
   }
 }
 
@@ -94,4 +94,82 @@ void SysTick_Handler(void)
   HAL_IncTick();
 }
 
+int connected = FALSE;
+volatile uint8_t set_connectable = 1;
+tHalUint16 connection_handle = 0;
+
+void GAP_DisconnectionComplete_CB(void)
+{
+  connected = FALSE;
+  //PRINTF("Disconnected\n");
+  /* Make the device connectable again. */
+  set_connectable = TRUE;
+}
+
+void GAP_ConnectionComplete_CB(tHalUint8 addr[6], tHalUint16 handle)
+{
+  connected = TRUE;
+  connection_handle = handle;
+  /*
+  PRINTF("Connected to device:");
+  for (int i = 5; i > 0; i--)
+    PRINTF("%02X-", addr[i]);
+  PRINTF("%02X\r\n", addr[0]);
+  */
+}
+
+void Read_Request_CB(tHalUint16 handle);
+void HCI_Event_CB(void *pckt)
+{
+  hci_uart_pckt *hci_pckt = pckt;
+  hci_event_pckt *event_pckt = (hci_event_pckt*)hci_pckt->data;
+
+  if (hci_pckt->type != HCI_EVENT_PKT)
+    return;
+
+  switch(event_pckt->evt)
+  {
+  case EVT_DISCONN_COMPLETE:
+    //evt_disconn_complete *evt = (void *)event_pckt->data;
+    GAP_DisconnectionComplete_CB();
+    break;
+
+  case EVT_LE_META_EVENT:
+  {
+    evt_le_meta_event *evt = (void *)event_pckt->data;
+    switch(evt->subevent)
+    {
+    case EVT_LE_CONN_COMPLETE:
+    {
+      evt_le_connection_complete *cc = (void *)evt->data;
+      GAP_ConnectionComplete_CB(cc->peer_bdaddr,cc->handle);
+      break;
+    }
+    }
+    break;
+  }
+
+  case EVT_VENDOR:
+  {
+    evt_blue_aci *blue_evt = (void*)event_pckt->data;
+    switch(blue_evt->ecode)
+    {
+    case EVT_BLUE_GATT_READ_PERMIT_REQ:
+    {
+      evt_gatt_read_permit_req *pr = (void*)blue_evt->data;
+      Read_Request_CB(pr->attr_handle);
+      break;
+#ifdef ST_OTA_BTL
+    case EVT_BLUE_GATT_ATTRIBUTE_MODIFIED:
+      evt_gatt_attr_modified *am = (void*)blue_evt->data;
+      //PRINTF("-> modified attribute 0x%04X \r\n",am->attr_handle);
+      OTA_Write_Request_CB(am);
+      break;
+#endif
+    }
+    }
+    break;
+  }
+  }
+}
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
