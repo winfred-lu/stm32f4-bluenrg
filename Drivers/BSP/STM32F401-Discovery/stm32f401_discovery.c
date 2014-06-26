@@ -122,14 +122,11 @@ static SPI_HandleTypeDef SpiHandle;
   */
 /* I2Cx bus function */
 static void     I2Cx_Init(void);
-static void     I2Cx_WriteData(uint16_t Addr, uint8_t Reg, uint8_t Value);
-static uint8_t  I2Cx_ReadData(uint16_t Addr, uint8_t Reg);
 static void     I2Cx_Error (void);
 static void     I2Cx_MspInit(I2C_HandleTypeDef *hi2c);
 
 /* SPIx bus function */
 static void     SPIx_Init(void);
-static uint8_t  SPIx_WriteRead(uint8_t byte);
 static void     SPIx_Error (void);
 static void     SPIx_MspInit(SPI_HandleTypeDef *hspi);
 
@@ -318,7 +315,7 @@ static void I2Cx_Init(void)
   * @param  Value: The target register value to be written
   * @retval  None
   */
-static void I2Cx_WriteData(uint16_t Addr, uint8_t Reg, uint8_t Value)
+void I2Cx_WriteData(uint16_t Addr, uint8_t Reg, uint8_t Value)
 {
   HAL_StatusTypeDef status = HAL_OK;
 
@@ -338,7 +335,7 @@ static void I2Cx_WriteData(uint16_t Addr, uint8_t Reg, uint8_t Value)
   * @param  Reg: The target register address to write
   * @retval Data read at register @
   */
-static uint8_t I2Cx_ReadData(uint16_t Addr, uint8_t Reg)
+uint8_t I2Cx_ReadData(uint16_t Addr, uint8_t Reg)
 {
   HAL_StatusTypeDef status = HAL_OK;
   uint8_t value = 0;
@@ -450,7 +447,7 @@ static void SPIx_Init(void)
   * @param  Byte : Byte send.
   * @retval The received byte value
   */
-static uint8_t SPIx_WriteRead(uint8_t Byte)
+uint8_t SPIx_WriteRead(uint8_t Byte)
 {
 
   uint8_t receivedbyte = 0;

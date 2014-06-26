@@ -306,6 +306,13 @@ void      COMPASSACCELERO_IO_ITConfig(void);
 void      COMPASSACCELERO_IO_Write(uint16_t DeviceAddr, uint8_t RegisterAddr, uint8_t Value);
 uint8_t   COMPASSACCELERO_IO_Read(uint16_t DeviceAddr, uint8_t RegisterAddr);
 
+/* I2Cx bus function */
+void     I2Cx_WriteData(uint16_t Addr, uint8_t Reg, uint8_t Value);
+uint8_t  I2Cx_ReadData(uint16_t Addr, uint8_t Reg);
+
+/* SPIx bus function */
+uint8_t  SPIx_WriteRead(uint8_t byte);
+
 /**
   * @}
   */
