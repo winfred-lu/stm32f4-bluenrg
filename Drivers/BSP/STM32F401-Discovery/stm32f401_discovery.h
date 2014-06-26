@@ -306,6 +306,11 @@ void      COMPASSACCELERO_IO_ITConfig(void);
 void      COMPASSACCELERO_IO_Write(uint16_t DeviceAddr, uint8_t RegisterAddr, uint8_t Value);
 uint8_t   COMPASSACCELERO_IO_Read(uint16_t DeviceAddr, uint8_t RegisterAddr);
 
+/* Link function for BLUENRG module */
+uint8_t BlueNRG_DataPresent(void);
+int32_t BlueNRG_SPI_Read_All(uint8_t *buffer, uint8_t buff_size);
+int32_t BlueNRG_SPI_Write(uint8_t* data1, uint8_t* data2, uint8_t Nb_bytes1, uint8_t Nb_bytes2);
+
 /* I2Cx bus function */
 void     I2Cx_WriteData(uint16_t Addr, uint8_t Reg, uint8_t Value);
 uint8_t  I2Cx_ReadData(uint16_t Addr, uint8_t Reg);

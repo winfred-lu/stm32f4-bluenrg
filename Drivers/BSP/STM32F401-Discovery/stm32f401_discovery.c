@@ -85,6 +85,8 @@
 /** @defgroup STM32F401_DISCOVERY_LOW_LEVEL_Private_Macros STM32F401_DISCOVERY_LOW_LEVEL_Private_Macros
   * @{
   */
+#define BLUENRG_IRQ_GPIO_PORT   GPIOA
+#define BLUENRG_IRQ_PIN         GPIO_PIN_1  /* PA.01 */
 /**
   * @}
   */
@@ -743,6 +745,94 @@ uint8_t COMPASSACCELERO_IO_Read(uint16_t DeviceAddr, uint8_t RegisterAddr)
   return I2Cx_ReadData(DeviceAddr, RegisterAddr);
 }
 
+/********************************* LINK BLUENRG *****************************/
+/**
+ * @brief  Reports if the BlueNRG has data for the host micro.
+ * @param  None
+ * @retval TRUE if data are present, FALSE otherwise
+ */
+uint8_t BlueNRG_DataPresent(void)
+{
+  if (HAL_GPIO_ReadPin(BLUENRG_IRQ_GPIO_PORT, BLUENRG_IRQ_PIN) == GPIO_PIN_SET)
+    return 1; /* True */
+  else
+    return 0; /* False */
+}
+
+/**
+ * @brief  Read from BlueNRG SPI buffer and store data into local buffer
+ * @param  buffer:    buffer where data from SPI are stored
+ *         buff_size: buffer size
+ * @retval number of read bytes
+ */
+int32_t BlueNRG_SPI_Read_All(uint8_t *buffer, uint8_t buff_size)
+{
+  uint16_t byte_count;
+  uint8_t i = 0;
+  uint8_t len = 0;
+
+  uint8_t header_master[5] = {0x0b, 0x00, 0x00, 0x00, 0x00};
+  uint8_t header_slave[5];
+
+  /* Read the header */
+  for (i = 0; i < 5; i++)
+    header_slave[i] = SPIx_WriteRead(header_master[i]);
+
+  if (header_slave[0] == 0x02) {
+    // device is ready
+    byte_count = (header_slave[4] << 8) | header_slave[3];
+    if (byte_count > 0) {
+      // avoid to read more data that size of the buffer
+      if (byte_count > buff_size)
+        byte_count = buff_size;
+      for (len = 0; len < byte_count; len++)
+        buffer[len] = SPIx_WriteRead(0xFF);
+    }
+  }
+  return len;
+}
+
+/**
+ * @brief  Write data from local buffer to SPI
+ * @param  data1:    first data buffer to be written
+ *         data2:    second data buffer to be written
+ *         Nb_bytes1: size of first data buffer to be written
+ *         Nb_bytes2: size of second data buffer to be written
+ * @retval number of read bytes
+ */
+int32_t BlueNRG_SPI_Write(uint8_t* data1, uint8_t* data2, uint8_t Nb_bytes1, uint8_t Nb_bytes2)
+{
+  uint32_t i;
+  int32_t result = 0;
+
+  unsigned char header_master[5] = {0x0a, 0x00, 0x00, 0x00, 0x00};
+  unsigned char header_slave[5]  = {0xaa, 0x00, 0x00, 0x00, 0x00};
+
+  //Disable_SPI_IRQ();
+
+  for (i = 0; i < 5; i++)
+    header_slave[i] = SPIx_WriteRead(header_master[i]);
+
+  if (header_slave[0] == 0x02) {
+    // SPI is ready
+    if (header_slave[1] >= (Nb_bytes1 + Nb_bytes2)) {
+      // Buffer is big enough
+      for (i = 0; i < Nb_bytes1; i++)
+        SPIx_WriteRead(*(data1 + i));
+      for (i = 0; i < Nb_bytes2; i++)
+        SPIx_WriteRead(*(data2 + i));
+    } else {
+      // Buffer is too small
+      result = -2;
+    }
+  } else {
+    // SPI is not ready
+    result = -1;
+  }
+
+  //Enable_SPI_IRQ();
+  return result;
+}
 
 
 /**
