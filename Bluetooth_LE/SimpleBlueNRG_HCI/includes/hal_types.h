@@ -22,6 +22,11 @@
 #define NULL ((void *)0)
 #endif
 
+#ifndef __LITTLE_ENDIAN
+#define __LITTLE_ENDIAN 0
+#define __BIG_ENDIAN    1
+#endif
+
 /* Byte order conversions */
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 #define htobs(d)  (d)
@@ -29,10 +34,10 @@
 #define btohs(d)  (d)
 #define btohl(d)  (d)
 #elif __BYTE_ORDER == __BIG_ENDIAN
-#define htobs(d)  bswap_16(d)
-#define htobl(d)  bswap_32(d)
-#define btohs(d)  bswap_16(d)
-#define btohl(d)  bswap_32(d)
+#define htobs(d)  (d<<8|d>>8)
+#define htobl(d)  (d<<24|((d<<8)&0x00ff0000)|((d>>8)&0x0000ff00)|((d>>24)&0x000000ff))
+#define btohs(d)  (d<<8|d>>8)
+#define btohl(d)  (d<<24|((d<<8)&0x00ff0000)|((d>>8)&0x0000ff00)|((d>>24)&0x000000ff))
 #else
 #error "Unknown byte order"
 #endif

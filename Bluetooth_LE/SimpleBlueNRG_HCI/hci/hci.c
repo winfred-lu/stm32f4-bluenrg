@@ -62,6 +62,8 @@ static tHciDataPacket     hciReadPacketBuffer[HCI_READ_PACKET_NUM_MAX];
 static uint8_t *hci_buffer = NULL;
 static volatile uint16_t hci_pckt_len;
 
+volatile uint8_t readPacketListFull=FALSE;
+
 void HCI_Init(void)
 {
     uint8_t index;
@@ -96,10 +98,10 @@ void HCI_Input(tHciDataPacket * hciReadPacket)
     
     hci_buffer = hciReadPacket->dataBuff;
     
+    if(state == WAITING_TYPE)
+        hci_pckt_len = 0;
+    
     while(hci_pckt_len < HCI_PACKET_SIZE){
-
-        if(state == WAITING_TYPE)
-            hci_pckt_len = 0;
 
         byte = hci_buffer[hci_pckt_len++];
 
@@ -114,6 +116,7 @@ void HCI_Input(tHciDataPacket * hciReadPacket)
             else{
                 /* Incorrect type. Reset state machine. */
                 state = WAITING_TYPE;
+                break;
             }
         }
         else if(state == WAITING_EVENT_CODE)
@@ -150,13 +153,7 @@ void HCI_Input(tHciDataPacket * hciReadPacket)
                 break;
             }
         }
-
-        if(hci_pckt_len >= HCI_MAX_PACKET_SIZE){
-            /* Packet too long for buffer. Reset state machine. */
-            state = WAITING_TYPE;
-        }
-    
-    }
+    }        
 }
 
 void enqueue_packet(tHciDataPacket * hciReadPacket)
@@ -180,8 +177,10 @@ void enqueue_packet(tHciDataPacket * hciReadPacket)
 
 void HCI_Process(void)
 {
+    uint8_t data_len;
+    uint8_t buffer[HCI_PACKET_SIZE];
     tHciDataPacket * hciReadPacket = NULL;
-    
+
     Disable_SPI_IRQ();
     tHalBool list_empty = list_is_empty(&hciReadPktRxQueue);        
     /* process any pending events read */
@@ -194,7 +193,50 @@ void HCI_Process(void)
         list_insert_tail(&hciReadPktPool, (tListNode *)hciReadPacket);
         list_empty = list_is_empty(&hciReadPktRxQueue);
     }
+    if (readPacketListFull) {
+      while(BlueNRG_DataPresent()) {
+	data_len = BlueNRG_SPI_Read_All(buffer, HCI_PACKET_SIZE);
+	if(data_len > 0)
+	  HCI_Event_CB(buffer);
+      }
+      readPacketListFull = FALSE;
+    }
+
     Enable_SPI_IRQ();    
+}
+
+void HCI_Isr(void)
+{
+  tHciDataPacket * hciReadPacket = NULL;
+  uint8_t data_len;
+    
+  Clear_SPI_EXTI_Flag();
+  while(SdkEvalSPI_Irq_Pin()){        
+    if (list_is_empty (&hciReadPktPool) == FALSE){
+            
+      /* enqueueing a packet for read */
+      list_remove_head (&hciReadPktPool, (tListNode **)&hciReadPacket);
+            
+      data_len = BlueNRG_SPI_Read_All(hciReadPacket->dataBuff,HCI_PACKET_SIZE);
+      if(data_len > 0){                    
+	HCI_Input(hciReadPacket);
+	// Packet will be inserted to te correct queue by 
+      }
+      else {
+	// Insert the packet back into the pool.
+	list_insert_head(&hciReadPktPool, (tListNode *)hciReadPacket);
+      }
+            
+    }
+    else{
+      // HCI Read Packet Pool is empty, wait for a free packet.
+      readPacketListFull = TRUE;
+      Clear_SPI_EXTI_Flag();
+      return;
+    }
+        
+    Clear_SPI_EXTI_Flag();
+  }
 }
 
 void hci_write(const void* data1, const void* data2, uint32_t n_bytes1, uint32_t n_bytes2){
@@ -403,7 +445,8 @@ int hci_disconnect(uint16_t	handle, uint8_t reason)
 	return 0;  
 }
 
-int hci_le_read_local_version(/* TODO: insert parameters */)
+int hci_le_read_local_version(uint8_t *hci_version, uint16_t *hci_revision, uint8_t *lmp_pal_version, 
+			      uint16_t *manufacturer_name, uint16_t *lmp_pal_subversion)
 {
 	struct hci_request rq;
 	read_local_version_rp resp;
@@ -424,6 +467,13 @@ int hci_le_read_local_version(/* TODO: insert parameters */)
 	if (resp.status) {
 		return -1;
 	}
+
+
+	*hci_version = resp.hci_version;
+	*hci_revision =  btohs(resp.hci_revision);
+	*lmp_pal_version = resp.lmp_pal_version;
+	*manufacturer_name = btohs(resp.manufacturer_name);
+	*lmp_pal_subversion = btohs(resp.lmp_pal_subversion);
 
 	return 0;
 }
@@ -925,7 +975,7 @@ int hci_read_transmit_power_level(uint16_t *conn_handle, uint8_t type, int8_t * 
 	Osal_MemSet(&resp, 0, sizeof(resp));
 
 	params.handle = *conn_handle;
-    params.type = type;
+	params.type = type;
 
 	Osal_MemSet(&rq, 0, sizeof(rq));
 	rq.ogf = OGF_HOST_CTL;

@@ -22,7 +22,7 @@
 #include <list.h>
 
 
-#define HCI_PACKET_SIZE				        255
+#define HCI_PACKET_SIZE				        71
 
 
 /*** Data types ***/
@@ -163,6 +163,9 @@ int hci_le_transmitter_test(uint8_t frequency, uint8_t length, uint8_t payload);
 
 int hci_le_test_end(uint16_t *num_pkts);
 
+int hci_le_read_local_version(uint8_t *hci_version, uint16_t *hci_revision, uint8_t *lmp_pal_version, 
+			      uint16_t *manufacturer_name, uint16_t *lmp_pal_subversion);
+
 /**
  * This function must be used to pass the packet received from the HCI
  * interface to the BLE Stack HCI state machine.
@@ -193,6 +196,12 @@ extern void HCI_Event_CB(void *pckt);
 */
 void HCI_Process(void);
 
+/**
+ * Iterrupt service routine that must be called when the BlueNRG 
+ * reports a packet received or an event to the host through the 
+ * BlueNRG interrupt line.
+ */
+void HCI_Isr(void);
 
 extern tListNode hciReadPktPool;
 extern tListNode hciReadPktRxQueue;

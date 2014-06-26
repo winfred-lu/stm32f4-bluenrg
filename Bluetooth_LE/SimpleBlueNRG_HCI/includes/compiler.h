@@ -15,11 +15,12 @@
 
 #ifdef __ICCARM__
 #define PACKED
-#endif
-
+#else
 #ifdef __GNUC__
-#ifndef __packed
-#define __packed __attribute__ ((__packed__))
-#endif
+#define __packed
+#define PACKED __attribute__((packed))
+#else
 #define PACKED
+#define __packed
+#endif
 #endif

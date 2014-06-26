@@ -46,7 +46,7 @@ tClockTime Clock_Time(void);
  * This function waits for a given number of milliseconds.
  *
  */
-void Clock_Wait(int i);
+void Clock_Wait(tHalUint32 i);
 
 
 #endif /* __CLOCK_H__ */

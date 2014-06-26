@@ -26,7 +26,7 @@
 #define PERIPHERAL_PREFERRED_CONN_PARAMS_UUID	(0x2A04)
 
 /*----------------Characteristic value lengths--------------*/
-#define DEVICE_NAME_CHARACTERISTIC_LEN			        (16)/* should this be 248 or is it implementation specific? */
+#define DEVICE_NAME_CHARACTERISTIC_LEN			        (8)
 #define APPEARANCE_CHARACTERISTIC_LEN			        (2)
 #define PERIPHERAL_PRIVACY_CHARACTERISTIC_LEN	        (1)
 #define RECONNECTION_ADDR_CHARACTERISTIC_LEN			(6)

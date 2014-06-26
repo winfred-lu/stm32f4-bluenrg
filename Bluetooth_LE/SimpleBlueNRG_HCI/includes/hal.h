@@ -23,16 +23,21 @@
 #include <hal_types.h>
 #include <ble_status.h>
 
+#if defined  (STM32L1XX_MD) || (STM32L1XX_XL) 
+#include "SDK_EVAL_Config.h"
+#else
+#include "SDK_EVAL_Spi_Driver.h"
+#endif
 /******************************************************************************
  * Macros
  *****************************************************************************/
 /* Little Endian buffer to Controller Byte order conversion */
-#define LE_TO_NRG_16(ptr)  (uint16) ( ((uint16) \
+#define LE_TO_HOST_16(ptr)  (uint16_t) ( ((uint16_t) \
                                            *((tHalUint8 *)ptr)) | \
-                                          ((tHalUint16) \
+                                          ((uint16_t) \
                                            *((tHalUint8 *)ptr + 1) << 8 ) )
 
-#define LE_TO_NRG_32(ptr)   (tHalUint32) ( ((tHalUint32) \
+#define LE_TO_HOST_32(ptr)   (tHalUint32) ( ((tHalUint32) \
                                            *((tHalUint8 *)ptr)) | \
                                            ((tHalUint32) \
                                             *((tHalUint8 *)ptr + 1) << 8)  | \
@@ -42,10 +47,10 @@
                                             *((tHalUint8 *)ptr + 3) << 24) )
 											
 /* Store Value into a buffer in Little Endian Format */
-#define STORE_LE_16(buf, val)    ( ((buf)[0] =  (tHalUint8) (val)    ) , \
+#define HOST_TO_LE_16(buf, val)    ( ((buf)[0] =  (tHalUint8) (val)    ) , \
                                    ((buf)[1] =  (tHalUint8) (val>>8) ) )
 
-#define STORE_LE_32(buf, val)    ( ((buf)[0] =  (tHalUint8) (val)     ) , \
+#define HOST_TO_LE_32(buf, val)    ( ((buf)[0] =  (tHalUint8) (val)     ) , \
                                    ((buf)[1] =  (tHalUint8) (val>>8)  ) , \
                                    ((buf)[2] =  (tHalUint8) (val>>16) ) , \
                                    ((buf)[3] =  (tHalUint8) (val>>24) ) ) 
@@ -77,8 +82,6 @@ void Enable_SPI_IRQ(void);
  * Disable interrupts from BLE controller.
  */
 void Disable_SPI_IRQ(void);
-
- 
 
 
 #endif /* __HAL_H__ */
