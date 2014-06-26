@@ -24,12 +24,15 @@
   *
   ******************************************************************************
   */
+#include <string.h>
+
 #include "stm32f4xx_hal.h"
 #include "stm32f401_discovery.h"
 #include "stm32f401_discovery_accelerometer.h"
 
 #include "hci_internal.h"
 #include "bluenrg_hci_internal.h"
+#include "sm.h"
 
 #ifdef WITH_VCP
 #include "usbd_core.h"
@@ -42,6 +45,8 @@ USBD_HandleTypeDef hUSBDDevice;
 
 static void HW_Init(void)
 {
+  GPIO_InitTypeDef  GPIO_InitStruct;
+
   /* Init STM32F401 discovery LEDs */
   BSP_LED_Init(LED3);
   BSP_LED_Init(LED4);
@@ -54,6 +59,21 @@ static void HW_Init(void)
 
   /* Init on-board AccelMag */
   BSP_ACCELERO_Init();
+
+  /* Init BlueNRG Reset and IRQ pin */
+  BLUENRG_RESET_GPIO_CLK_ENABLE();
+  GPIO_InitStruct.Pin   = BLUENRG_RESET_PIN;
+  GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull  = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+  HAL_GPIO_Init(BLUENRG_RESET_GPIO_PORT, &GPIO_InitStruct);
+
+  BLUENRG_IRQ_GPIO_CLK_ENABLE();
+  GPIO_InitStruct.Pin   = BLUENRG_IRQ_PIN;
+  GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull  = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+  HAL_GPIO_Init(BLUENRG_IRQ_GPIO_PORT, &GPIO_InitStruct);
 
 #ifdef WITH_VCP
   /* Init Device Library */
@@ -70,6 +90,65 @@ static void HW_Init(void)
 #endif
 }
 
+static void BlueNRG_Init()
+{
+  int rc;
+  uint8_t bdaddr[] = {0x12, 0x34, 0x00, 0xE1, 0x80, 0x02};
+  uint16_t service_handle, dev_name_char_handle, appearance_char_handle;
+  const char *ble_name = "BlueNRG";
+
+  BSP_LED_On(LED3);
+  HCI_Init();
+  BlueNRG_RST();
+
+  BSP_LED_On(LED4);
+  rc = aci_hal_write_config_data(CONFIG_DATA_PUBADDR_OFFSET,
+                                 CONFIG_DATA_PUBADDR_LEN, bdaddr);
+  while (rc) {
+    HAL_Delay(100);
+    BSP_LED_Toggle(LED4);
+  }
+
+  BSP_LED_On(LED5);
+  rc = aci_gatt_init();
+  while (rc) {
+    HAL_Delay(100);
+    BSP_LED_Toggle(LED5);
+  }
+
+  BSP_LED_On(LED6);
+  rc = aci_gap_init(1, &service_handle, &dev_name_char_handle,
+                    &appearance_char_handle);
+  while (rc) {
+    HAL_Delay(100);
+    BSP_LED_Toggle(LED6);
+  }
+
+  BSP_LED_Off(LED3);
+  rc = aci_gatt_update_char_value(service_handle, dev_name_char_handle,
+                                  0, strlen(ble_name), (uint8_t *)ble_name);
+  while (rc) {
+    HAL_Delay(100);
+    BSP_LED_Toggle(LED3);
+  }
+
+  BSP_LED_Off(LED4);
+  rc = aci_gap_set_auth_requirement(MITM_PROTECTION_REQUIRED,
+                                    OOB_AUTH_DATA_ABSENT,
+                                    NULL,
+                                    7,
+                                    16,
+                                    USE_FIXED_PIN_FOR_PAIRING,
+                                    123456,
+                                    BONDING);
+  while (rc) {
+    HAL_Delay(100);
+    BSP_LED_Toggle(LED4);
+  }
+
+  BSP_LED_Off(LED5);
+}
+
 /**
   * @brief  Main program
   * @param  None
@@ -79,13 +158,13 @@ int main(void)
 {
   HAL_Init();
   HW_Init();
-  HCI_Init();
+  BlueNRG_Init();
 
   while (1)
   {
     /* Blink the orange LED */
     HAL_Delay(500);
-    HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
+    BSP_LED_Toggle(LED3);
   }
 }
 
