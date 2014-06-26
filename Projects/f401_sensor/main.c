@@ -24,9 +24,9 @@
   *
   ******************************************************************************
   */
+#include <stdio.h>
 #include <string.h>
 
-#include "stm32f4xx_hal.h"
 #include "stm32f401_discovery.h"
 #include "stm32f401_discovery_accelerometer.h"
 
@@ -41,6 +41,47 @@
 #include "usbd_desc.h"
 
 USBD_HandleTypeDef hUSBDDevice;
+#endif
+
+#ifdef WITH_USART
+USART_HandleTypeDef UsartHandle;
+
+void HAL_USART_MspInit(USART_HandleTypeDef *huart)
+{
+  GPIO_InitTypeDef  GPIO_InitStruct;
+
+  /* Enable GPIO TX/RX and USART clock */
+  __GPIOA_CLK_ENABLE();
+  __USART2_CLK_ENABLE();
+
+  /* USART TX/RX GPIO pin configuration  */
+  GPIO_InitStruct.Pin       = GPIO_PIN_2 | GPIO_PIN_3;
+  GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull      = GPIO_NOPULL;
+  GPIO_InitStruct.Speed     = GPIO_SPEED_FAST;
+  GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /* NVIC for USART */
+  HAL_NVIC_SetPriority(USART2_IRQn, 0, 1);
+  HAL_NVIC_EnableIRQ(USART2_IRQn);
+}
+
+static void ColorfulRingOfDeath(void)
+{
+  uint16_t ring = 1;
+  while (1)
+  {
+    uint32_t count = 0;
+    while (count++ < 100000)
+      ;
+    GPIOD->BSRRH = (ring << 12);
+    ring = ring << 1;
+    if (ring >= 1<<4)
+      ring = 1;
+    GPIOD->BSRRL = (ring << 12);
+  }
+}
 #endif
 
 static void HW_Init(void)
@@ -74,6 +115,20 @@ static void HW_Init(void)
   GPIO_InitStruct.Pull  = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
   HAL_GPIO_Init(BLUENRG_IRQ_GPIO_PORT, &GPIO_InitStruct);
+
+#ifdef WITH_USART
+  /* Init USART port */
+  UsartHandle.Instance        = USART2;
+  UsartHandle.Init.BaudRate   = 9600;
+  UsartHandle.Init.WordLength = USART_WORDLENGTH_8B;
+  UsartHandle.Init.StopBits   = USART_STOPBITS_1;
+  UsartHandle.Init.Parity     = USART_PARITY_NONE;
+  UsartHandle.Init.Mode       = USART_MODE_TX_RX;
+  if (HAL_USART_Init(&UsartHandle) != HAL_OK)
+  {
+    ColorfulRingOfDeath();
+  }
+#endif
 
 #ifdef WITH_VCP
   /* Init Device Library */
@@ -156,15 +211,28 @@ static void BlueNRG_Init()
   */
 int main(void)
 {
+  int16_t accData[3];
+#ifdef WITH_USART
+  char msg[3] = {'0','\r','\n'};
+#endif
+
   HAL_Init();
   HW_Init();
-  BlueNRG_Init();
+  //BlueNRG_Init();
 
   while (1)
   {
     /* Blink the orange LED */
     HAL_Delay(500);
     BSP_LED_Toggle(LED3);
+
+    BSP_ACCELERO_GetXYZ(accData);
+
+#ifdef WITH_USART
+    msg[0] = (msg[0] == '9')? '0' : msg[0]+1;
+    if (HAL_USART_Transmit(&UsartHandle, (uint8_t *)msg, 3, 5000) != HAL_OK)
+      ColorfulRingOfDeath();
+#endif
   }
 }
 
