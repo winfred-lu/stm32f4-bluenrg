@@ -85,8 +85,6 @@
 /** @defgroup STM32F401_DISCOVERY_LOW_LEVEL_Private_Macros STM32F401_DISCOVERY_LOW_LEVEL_Private_Macros
   * @{
   */
-#define BLUENRG_IRQ_GPIO_PORT   GPIOA
-#define BLUENRG_IRQ_PIN         GPIO_PIN_1  /* PA.01 */
 /**
   * @}
   */
@@ -757,6 +755,19 @@ uint8_t BlueNRG_DataPresent(void)
     return 1; /* True */
   else
     return 0; /* False */
+}
+
+/**
+ * @brief  Reset the BlueNRG
+ * @param  None
+ * @retval None
+ */
+void BlueNRG_RST(void)
+{
+  HAL_GPIO_WritePin(BLUENRG_RESET_GPIO_PORT, BLUENRG_RESET_PIN, GPIO_PIN_RESET);
+  HAL_Delay(10);
+  HAL_GPIO_WritePin(BLUENRG_RESET_GPIO_PORT, BLUENRG_RESET_PIN, GPIO_PIN_SET);
+  HAL_Delay(10);
 }
 
 /**

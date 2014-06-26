@@ -263,10 +263,21 @@ typedef enum
 #define ACCELERO_INT1_EXTI_IRQn          EXTI4_IRQn
 #define ACCELERO_INT2_PIN                GPIO_PIN_5                  /* PE.05 */
 #define ACCELERO_INT2_EXTI_IRQn          EXTI9_5_IRQn
-
 /**
   * @}
   */
+
+/*##################### BlueNRG ##########################*/
+#define BLUENRG_IRQ_GPIO_PORT             GPIOA
+#define BLUENRG_IRQ_GPIO_CLK_ENABLE()     __GPIOA_CLK_ENABLE()
+#define BLUENRG_IRQ_GPIO_CLK_DISABLE()    __GPIOA_CLK_DISABLE()
+#define BLUENRG_IRQ_PIN                   GPIO_PIN_1                /* PA.01 */
+
+#define BLUENRG_RESET_GPIO_PORT           GPIOB
+#define BLUENRG_RESET_GPIO_CLK_ENABLE()   __GPIOB_CLK_ENABLE()
+#define BLUENRG_RESET_GPIO_CLK_DISABLE()  __GPIOB_CLK_DISABLE()
+#define BLUENRG_RESET_PIN                 GPIO_PIN_2                /* PB.02 */
+
 /**
   * @}
   */
@@ -307,6 +318,7 @@ void      COMPASSACCELERO_IO_Write(uint16_t DeviceAddr, uint8_t RegisterAddr, ui
 uint8_t   COMPASSACCELERO_IO_Read(uint16_t DeviceAddr, uint8_t RegisterAddr);
 
 /* Link function for BLUENRG module */
+void BlueNRG_RST(void);
 uint8_t BlueNRG_DataPresent(void);
 int32_t BlueNRG_SPI_Read_All(uint8_t *buffer, uint8_t buff_size);
 int32_t BlueNRG_SPI_Write(uint8_t* data1, uint8_t* data2, uint8_t Nb_bytes1, uint8_t Nb_bytes2);
