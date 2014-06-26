@@ -1,10 +1,10 @@
 /******************************************************************************
 *
-*  File Description 
+*  File Description
 *  ---------------------
 * This file defines constants and functions for HCI layer.
 * See Bluetooth Core v 4.0, Vol. 2, Part E.
-* 
+*
 *******************************************************************************/
 
 #ifndef __HCI_INTERNAL_H_
@@ -28,26 +28,26 @@
 #define HCI_VENDOR_PKT		0xff
 
 
-typedef __packed struct _hci_uart_pckt{
+typedef struct __packed _hci_uart_pckt{
 	tHalUint8	type;
 	tHalUint8	data[0];
 } PACKED hci_uart_pckt;
 #define HCI_HDR_SIZE 1
 
-typedef __packed struct _hci_command_hdr{
+typedef struct __packed _hci_command_hdr{
 	tHalUint16	opcode;		/* OCF & OGF */
 	tHalUint8		plen;
 } PACKED hci_command_hdr;
 #define HCI_COMMAND_HDR_SIZE 	3
 
-typedef __packed struct _hci_event_pckt{
+typedef struct __packed _hci_event_pckt{
 	tHalUint8		evt;
 	tHalUint8		plen;
     tHalUint8	    data[0];
 } PACKED hci_event_pckt;
 #define HCI_EVENT_HDR_SIZE 	2
 
-typedef __packed struct _hci_acl_hdr{
+typedef struct __packed _hci_acl_hdr{
 	tHalUint16	handle;		/* Handle & Flags(PB, BC) */
 	tHalUint16	dlen;
 } PACKED hci_acl_hdr;
@@ -58,7 +58,7 @@ typedef __packed struct _hci_acl_hdr{
 #define OGF_LINK_CTL		            0x01
 
 #define OCF_DISCONNECT			        0x0006
-typedef __packed struct _disconnect_cp{
+typedef struct __packed _disconnect_cp{
 	uint16_t	handle;
 	uint8_t		reason;
 } PACKED disconnect_cp;
@@ -72,12 +72,12 @@ typedef __packed struct _disconnect_cp{
 #define OCF_RESET			            0x0003
 
 #define OCF_READ_TRANSMIT_POWER_LEVEL	0x002D
-typedef __packed struct _read_transmit_power_level_cp{
+typedef struct __packed _read_transmit_power_level_cp{
 	uint16_t	handle;
 	uint8_t		type;
 } PACKED read_transmit_power_level_cp;
 #define READ_TRANSMIT_POWER_LEVEL_CP_SIZE 3
-typedef __packed struct _read_transmit_power_level_rp{
+typedef struct __packed _read_transmit_power_level_rp{
 	uint8_t		status;
 	uint16_t	handle;
 	int8_t		level;
@@ -92,7 +92,7 @@ typedef __packed struct _read_transmit_power_level_rp{
 #define OGF_INFO_PARAM		            0x04
 
 #define OCF_READ_LOCAL_VERSION		    0x0001
-typedef __packed struct _read_local_version_rp{
+typedef struct __packed _read_local_version_rp{
 	uint8_t		status;
 	uint8_t		hci_version;
     uint16_t    hci_revision;
@@ -106,7 +106,7 @@ typedef __packed struct _read_local_version_rp{
 #define OCF_READ_LOCAL_FEATURES		    0x0003
 
 #define OCF_READ_BD_ADDR		0x0009
-typedef __packed struct _read_bd_addr_rp{
+typedef struct __packed _read_bd_addr_rp{
 	uint8_t		status;
 	tBDAddr		bdaddr;
 } PACKED read_bd_addr_rp;
@@ -116,11 +116,11 @@ typedef __packed struct _read_bd_addr_rp{
 #define OGF_STATUS_PARAM	            0x05
 
 #define OCF_READ_RSSI                   0x0005
-typedef __packed struct _read_rssi_cp{
+typedef struct __packed _read_rssi_cp{
 	uint16_t	handle;
 } PACKED read_rssi_cp;
 #define READ_RSSI_CP_SIZE 2
-typedef __packed struct _read_rssi_rp{
+typedef struct __packed _read_rssi_rp{
 	uint8_t		status;
 	uint16_t	handle;
 	int8_t		rssi;
@@ -132,13 +132,13 @@ typedef __packed struct _read_rssi_rp{
 #define OGF_LE_CTL		0x08
 
 #define OCF_LE_SET_EVENT_MASK			0x0001
-typedef __packed struct _le_set_event_mask_cp{
+typedef struct __packed _le_set_event_mask_cp{
 	uint8_t		mask[8];
 } PACKED le_set_event_mask_cp;
 #define LE_SET_EVENT_MASK_CP_SIZE 8
 
 #define OCF_LE_READ_BUFFER_SIZE			0x0002
-typedef __packed struct _le_read_buffer_size_rp{
+typedef struct __packed _le_read_buffer_size_rp{
 	uint8_t		status;
 	uint16_t	pkt_len;
 	uint8_t		max_pkt;
@@ -146,20 +146,20 @@ typedef __packed struct _le_read_buffer_size_rp{
 #define LE_READ_BUFFER_SIZE_RP_SIZE 4
 
 #define OCF_LE_READ_LOCAL_SUPPORTED_FEATURES	0x0003
-typedef __packed struct _le_read_local_supported_features_rp{
+typedef struct __packed _le_read_local_supported_features_rp{
 	uint8_t		status;
 	uint8_t		features[8];
 } PACKED le_read_local_supported_features_rp;
 #define LE_READ_LOCAL_SUPPORTED_FEATURES_RP_SIZE 9
 
 #define OCF_LE_SET_RANDOM_ADDRESS		0x0005
-typedef __packed struct _le_set_random_address_cp{
+typedef struct __packed _le_set_random_address_cp{
 	tBDAddr	bdaddr;
 } PACKED le_set_random_address_cp;
 #define LE_SET_RANDOM_ADDRESS_CP_SIZE 6
 
 #define OCF_LE_SET_ADV_PARAMETERS	0x0006
-typedef __packed struct _le_set_adv_parameters_cp{
+typedef struct __packed _le_set_adv_parameters_cp{
 	uint16_t	min_interval;
 	uint16_t	max_interval;
 	uint8_t		advtype;
@@ -172,34 +172,34 @@ typedef __packed struct _le_set_adv_parameters_cp{
 #define LE_SET_ADV_PARAMETERS_CP_SIZE 15
 
 #define OCF_LE_READ_ADV_CHANNEL_TX_POWER	0x0007
-typedef __packed struct _le_read_adv_channel_tx_power_rp{
+typedef struct __packed _le_read_adv_channel_tx_power_rp{
 	uint8_t		status;
 	int8_t		level;
 } PACKED le_read_adv_channel_tx_power_rp;
 #define LE_READ_ADV_CHANNEL_TX_POWER_RP_SIZE 2
 
 #define OCF_LE_SET_ADV_DATA		0x0008
-typedef __packed struct _le_set_adv_data_cp{
+typedef struct __packed _le_set_adv_data_cp{
 	uint8_t		length;
 	uint8_t		data[31];
 } PACKED le_set_adv_data_cp;
 #define LE_SET_ADV_DATA_CP_SIZE 32
 
 #define OCF_LE_SET_SCAN_RESPONSE_DATA		0x0009
-typedef __packed struct _le_set_scan_response_data_cp{
+typedef struct __packed _le_set_scan_response_data_cp{
 	uint8_t		length;
 	uint8_t		data[31];
 } PACKED le_set_scan_response_data_cp;
 #define LE_SET_SCAN_RESPONSE_DATA_CP_SIZE 32
 
 #define OCF_LE_SET_ADVERTISE_ENABLE		0x000A
-typedef __packed struct _le_set_advertise_enable_cp{
+typedef struct __packed _le_set_advertise_enable_cp{
 	uint8_t		enable;
 } PACKED le_set_advertise_enable_cp;
 #define LE_SET_ADVERTISE_ENABLE_CP_SIZE 1
 
 #define OCF_LE_SET_SCAN_PARAMETERS		0x000B
-typedef __packed struct _le_set_scan_parameters_cp{
+typedef struct __packed _le_set_scan_parameters_cp{
 	uint8_t		type;
 	uint16_t	interval;
 	uint16_t	window;
@@ -209,14 +209,14 @@ typedef __packed struct _le_set_scan_parameters_cp{
 #define LE_SET_SCAN_PARAMETERS_CP_SIZE 7
 
 #define OCF_LE_SET_SCAN_ENABLE			0x000C
-typedef __packed struct _le_set_scan_enable_cp{
+typedef struct __packed _le_set_scan_enable_cp{
 	uint8_t		enable;
 	uint8_t		filter_dup;
 } PACKED le_set_scan_enable_cp;
 #define LE_SET_SCAN_ENABLE_CP_SIZE 2
 
 #define OCF_LE_CREATE_CONN			0x000D
-typedef __packed struct _le_create_connection_cp{
+typedef struct __packed _le_create_connection_cp{
 	uint16_t	interval;
 	uint16_t	window;
 	uint8_t		initiator_filter;
@@ -235,7 +235,7 @@ typedef __packed struct _le_create_connection_cp{
 #define OCF_LE_CREATE_CONN_CANCEL		0x000E
 
 #define OCF_LE_READ_WHITE_LIST_SIZE		0x000F
-typedef __packed struct _le_read_white_list_size_rp{
+typedef struct __packed _le_read_white_list_size_rp{
 	uint8_t		status;
 	uint8_t		size;
 } PACKED le_read_white_list_size_rp;
@@ -244,21 +244,21 @@ typedef __packed struct _le_read_white_list_size_rp{
 #define OCF_LE_CLEAR_WHITE_LIST			0x0010
 
 #define OCF_LE_ADD_DEVICE_TO_WHITE_LIST		0x0011
-typedef __packed struct _le_add_device_to_white_list_cp{
+typedef struct __packed _le_add_device_to_white_list_cp{
 	uint8_t		bdaddr_type;
 	tBDAddr 	bdaddr;
 } PACKED le_add_device_to_white_list_cp;
 #define LE_ADD_DEVICE_TO_WHITE_LIST_CP_SIZE 7
 
 #define OCF_LE_REMOVE_DEVICE_FROM_WHITE_LIST	0x0012
-typedef __packed struct _le_remove_device_from_white_list_cp{
+typedef struct __packed _le_remove_device_from_white_list_cp{
 	uint8_t		bdaddr_type;
 	tBDAddr 	bdaddr;
 } PACKED le_remove_device_from_white_list_cp;
 #define LE_REMOVE_DEVICE_FROM_WHITE_LIST_CP_SIZE 7
 
 #define OCF_LE_CONN_UPDATE			0x0013
-typedef __packed struct _le_connection_update_cp{
+typedef struct __packed _le_connection_update_cp{
 	uint16_t	handle;
 	uint16_t	min_interval;
 	uint16_t	max_interval;
@@ -270,18 +270,18 @@ typedef __packed struct _le_connection_update_cp{
 #define LE_CONN_UPDATE_CP_SIZE 14
 
 #define OCF_LE_SET_HOST_CHANNEL_CLASSIFICATION	0x0014
-typedef __packed struct _le_set_host_channel_classification_cp{
+typedef struct __packed _le_set_host_channel_classification_cp{
 	uint8_t		map[5];
 } PACKED le_set_host_channel_classification_cp;
 #define LE_SET_HOST_CHANNEL_CLASSIFICATION_CP_SIZE 5
 
 #define OCF_LE_READ_CHANNEL_MAP			0x0015
-typedef __packed struct _le_read_channel_map_cp{
+typedef struct __packed _le_read_channel_map_cp{
 	uint16_t	handle;
 } PACKED le_read_channel_map_cp;
 #define LE_READ_CHANNEL_MAP_CP_SIZE 2
 
-typedef __packed struct _le_read_channel_map_rp{
+typedef struct __packed _le_read_channel_map_rp{
 	uint8_t		status;
 	uint16_t	handle;
 	uint8_t		map[5];
@@ -289,33 +289,33 @@ typedef __packed struct _le_read_channel_map_rp{
 #define LE_READ_CHANNEL_MAP_RP_SIZE 8
 
 #define OCF_LE_READ_REMOTE_USED_FEATURES	0x0016
-typedef __packed struct _le_read_remote_used_features_cp{
+typedef struct __packed _le_read_remote_used_features_cp{
 	uint16_t	handle;
 } PACKED le_read_remote_used_features_cp;
 #define LE_READ_REMOTE_USED_FEATURES_CP_SIZE 2
 
 #define OCF_LE_ENCRYPT				0x0017
-typedef __packed struct _le_encrypt_cp{
+typedef struct __packed _le_encrypt_cp{
 	uint8_t		key[16];
 	uint8_t		plaintext[16];
 } PACKED le_encrypt_cp;
 #define LE_ENCRYPT_CP_SIZE 32
 
-typedef __packed struct _le_encrypt_rp{
+typedef struct __packed _le_encrypt_rp{
 	uint8_t		status;
 	uint8_t		encdata[16];
 } PACKED le_encrypt_rp;
 #define LE_ENCRYPT_RP_SIZE 17
 
 #define OCF_LE_RAND				0x0018
-typedef __packed struct _le_rand_rp{
+typedef struct __packed _le_rand_rp{
 	uint8_t	status;
 	uint8_t	random[8];
 } PACKED le_rand_rp;
 #define LE_RAND_RP_SIZE 9
 
 #define OCF_LE_START_ENCRYPTION			0x0019
-typedef __packed struct _le_start_encryption_cp{
+typedef struct __packed _le_start_encryption_cp{
 	uint16_t	handle;
 	uint8_t	    random[8];
 	uint16_t	diversifier;
@@ -324,45 +324,45 @@ typedef __packed struct _le_start_encryption_cp{
 #define LE_START_ENCRYPTION_CP_SIZE 28
 
 #define OCF_LE_LTK_REPLY			0x001A
-typedef __packed struct _le_ltk_reply_cp{
+typedef struct __packed _le_ltk_reply_cp{
 	uint16_t	handle;
 	uint8_t		key[16];
 } PACKED le_ltk_reply_cp;
 #define LE_LTK_REPLY_CP_SIZE 18
-  
-typedef __packed struct _le_ltk_reply_rp{
+
+typedef struct __packed _le_ltk_reply_rp{
 	uint8_t		status;
 	uint16_t	handle;
 } PACKED le_ltk_reply_rp;
 #define LE_LTK_REPLY_RP_SIZE 3
 
 #define OCF_LE_LTK_NEG_REPLY			0x001B
-typedef __packed struct _le_ltk_neg_reply_cp{
+typedef struct __packed _le_ltk_neg_reply_cp{
 	uint16_t	handle;
 } PACKED le_ltk_neg_reply_cp;
 #define LE_LTK_NEG_REPLY_CP_SIZE 2
 
-typedef __packed struct _le_ltk_neg_reply_rp{
+typedef struct __packed _le_ltk_neg_reply_rp{
 	uint8_t		status;
 	uint16_t	handle;
 } PACKED le_ltk_neg_reply_rp;
 #define LE_LTK_NEG_REPLY_RP_SIZE 3
 
 #define OCF_LE_READ_SUPPORTED_STATES		0x001C
-typedef __packed struct _le_read_supported_states_rp{
+typedef struct __packed _le_read_supported_states_rp{
 	uint8_t		status;
 	uint8_t	    states[8];
 } PACKED le_read_supported_states_rp;
 #define LE_READ_SUPPORTED_STATES_RP_SIZE 9
 
 #define OCF_LE_RECEIVER_TEST			0x001D
-typedef __packed struct _le_receiver_test_cp{
+typedef struct __packed _le_receiver_test_cp{
 	uint8_t		frequency;
 } PACKED le_receiver_test_cp;
 #define LE_RECEIVER_TEST_CP_SIZE 1
 
 #define OCF_LE_TRANSMITTER_TEST			0x001E
-typedef __packed struct _le_transmitter_test_cp{
+typedef struct __packed _le_transmitter_test_cp{
 	uint8_t		frequency;
 	uint8_t		length;
 	uint8_t		payload;
@@ -370,7 +370,7 @@ typedef __packed struct _le_transmitter_test_cp{
 #define LE_TRANSMITTER_TEST_CP_SIZE 3
 
 #define OCF_LE_TEST_END				0x001F
-typedef __packed struct _le_test_end_rp{
+typedef struct __packed _le_test_end_rp{
 	uint8_t		status;
 	uint16_t	num_pkts;
 } PACKED le_test_end_rp;
@@ -382,7 +382,7 @@ typedef __packed struct _le_test_end_rp{
 
 /*------------- Events -------------*/
 #define EVT_CONN_COMPLETE		0x03
-typedef __packed struct _evt_conn_complete{
+typedef struct __packed _evt_conn_complete{
 	uint8_t		status;
 	uint16_t	handle;
 	tBDAddr 	bdaddr;
@@ -392,7 +392,7 @@ typedef __packed struct _evt_conn_complete{
 #define EVT_CONN_COMPLETE_SIZE 13
 
 #define EVT_DISCONN_COMPLETE		0x05
-typedef __packed struct _evt_disconn_complete{
+typedef struct __packed _evt_disconn_complete{
 	uint8_t		status;
 	uint16_t	handle;
 	uint8_t		reason;
@@ -400,7 +400,7 @@ typedef __packed struct _evt_disconn_complete{
 #define EVT_DISCONN_COMPLETE_SIZE 4
 
 #define EVT_ENCRYPT_CHANGE		0x08
-typedef __packed struct _evt_encrypt_change{
+typedef struct __packed _evt_encrypt_change{
 	uint8_t		status;
 	uint16_t	handle;
 	uint8_t		encrypt;
@@ -410,14 +410,14 @@ typedef __packed struct _evt_encrypt_change{
 #define EVT_READ_REMOTE_VERSION_COMPLETE	0x0C
 
 #define EVT_CMD_COMPLETE 		0x0E
-typedef __packed struct _evt_cmd_complete{
+typedef struct __packed _evt_cmd_complete{
 	tHalUint8		ncmd;
 	tHalUint16	opcode;
 } PACKED evt_cmd_complete;
 #define EVT_CMD_COMPLETE_SIZE 3
 
 #define EVT_CMD_STATUS 			0x0F
-typedef __packed struct _evt_cmd_status{
+typedef struct __packed _evt_cmd_status{
 	tHalUint8		status;
 	tHalUint8		ncmd;
 	tHalUint16	opcode;
@@ -425,41 +425,41 @@ typedef __packed struct _evt_cmd_status{
 #define EVT_CMD_STATUS_SIZE 4
 
 #define EVT_HARDWARE_ERROR		0x10
-typedef __packed struct _evt_hardware_error{
+typedef struct __packed _evt_hardware_error{
 	uint8_t		code;
 } PACKED evt_hardware_error;
 #define EVT_HARDWARE_ERROR_SIZE 1
 
 #define EVT_NUM_COMP_PKTS		0x13
-typedef __packed struct _evt_num_comp_pkts{
+typedef struct __packed _evt_num_comp_pkts{
 	uint8_t		num_hndl;
 	/* variable length part */
 } PACKED evt_num_comp_pkts;
 #define EVT_NUM_COMP_PKTS_SIZE 1
 
 /* variable length part of evt_num_comp_pkts. */
-typedef __packed struct _evt_num_comp_pkts_param{
+typedef struct __packed _evt_num_comp_pkts_param{
 	uint16_t		hndl;
 	uint16_t		num_comp_pkts;
 } PACKED evt_num_comp_pkts_param;
 #define EVT_NUM_COMP_PKTS_PARAM_SIZE 1
 
 #define EVT_ENCRYPTION_KEY_REFRESH_COMPLETE	0x30
-typedef __packed struct _evt_encryption_key_refresh_complete{
+typedef struct __packed _evt_encryption_key_refresh_complete{
 	uint8_t		status;
 	uint16_t	handle;
 } PACKED evt_encryption_key_refresh_complete;
 #define EVT_ENCRYPTION_KEY_REFRESH_COMPLETE_SIZE 3
 
 #define EVT_LE_META_EVENT	0x3E
-typedef __packed struct _evt_le_meta_event{
+typedef struct __packed _evt_le_meta_event{
 	tHalUint8		subevent;
 	tHalUint8		data[0];
 } PACKED evt_le_meta_event;
 #define EVT_LE_META_EVENT_SIZE 1
 
 #define EVT_LE_CONN_COMPLETE	0x01
-typedef __packed struct _evt_le_connection_complete{
+typedef struct __packed _evt_le_connection_complete{
 	uint8_t		status;
 	uint16_t	handle;
 	uint8_t		role;
@@ -473,7 +473,7 @@ typedef __packed struct _evt_le_connection_complete{
 #define EVT_LE_CONN_COMPLETE_SIZE 18
 
 #define EVT_LE_ADVERTISING_REPORT	0x02
-typedef __packed struct _le_advertising_info{
+typedef struct __packed _le_advertising_info{
 	uint8_t		evt_type;
 	uint8_t		bdaddr_type;
 	tBDAddr	        bdaddr;
@@ -483,7 +483,7 @@ typedef __packed struct _le_advertising_info{
 #define LE_ADVERTISING_INFO_SIZE 9
 
 #define EVT_LE_CONN_UPDATE_COMPLETE	0x03
-typedef __packed struct _evt_le_connection_update_complete{
+typedef struct __packed _evt_le_connection_update_complete{
 	uint8_t		status;
 	uint16_t	handle;
 	uint16_t	interval;
@@ -493,7 +493,7 @@ typedef __packed struct _evt_le_connection_update_complete{
 #define EVT_LE_CONN_UPDATE_COMPLETE_SIZE 9
 
 #define EVT_LE_READ_REMOTE_USED_FEATURES_COMPLETE	0x04
-typedef __packed struct _evt_le_read_remote_used_features_complete{
+typedef struct __packed _evt_le_read_remote_used_features_complete{
 	uint8_t		status;
 	uint16_t	handle;
 	uint8_t		features[8];
@@ -501,7 +501,7 @@ typedef __packed struct _evt_le_read_remote_used_features_complete{
 #define EVT_LE_READ_REMOTE_USED_FEATURES_COMPLETE_SIZE 11
 
 #define EVT_LE_LTK_REQUEST	0x05
-typedef __packed struct _evt_le_long_term_key_request{
+typedef struct __packed _evt_le_long_term_key_request{
 	uint16_t	handle;
 	uint8_t	    random[8];
 	uint16_t	ediv;
