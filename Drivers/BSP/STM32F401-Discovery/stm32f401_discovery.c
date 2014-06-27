@@ -64,6 +64,10 @@
 /** @defgroup STM32F401_DISCOVERY_LOW_LEVEL_Private_Defines STM32F401_DISCOVERY_LOW_LEVEL_Private_Defines
   * @{
   */
+/* Added define for enabling BlueNRG SPI fix */
+#ifndef ENABLE_SPI_FIX
+#define ENABLE_SPI_FIX 1
+#endif
 
 /**
   * @brief STM32F401 DISCO BSP Driver version number V2.0.0
@@ -821,8 +825,28 @@ int32_t BlueNRG_SPI_Write(uint8_t* data1, uint8_t* data2, uint8_t Nb_bytes1, uin
 
   //Disable_SPI_IRQ();
 
+#if ENABLE_SPI_FIX
+  GPIO_InitTypeDef  GPIO_InitStruct;
+  /* set IRQ pin to output */
+  GPIO_InitStruct.Pin   = BLUENRG_IRQ_PIN;
+  GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull  = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+  HAL_GPIO_Init(BLUENRG_IRQ_GPIO_PORT, &GPIO_InitStruct);
+
+  /* Pull IRQ high */
+  HAL_GPIO_WritePin(BLUENRG_IRQ_GPIO_PORT, BLUENRG_IRQ_PIN, GPIO_PIN_SET);
+  HAL_Delay(1);
+#endif
+
   for (i = 0; i < 5; i++)
     header_slave[i] = SPIx_WriteRead(header_master[i]);
+
+#if ENABLE_SPI_FIX
+  /* IRQ input again */
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  HAL_GPIO_Init(BLUENRG_IRQ_GPIO_PORT, &GPIO_InitStruct);
+#endif
 
   if (header_slave[0] == 0x02) {
     // SPI is ready
