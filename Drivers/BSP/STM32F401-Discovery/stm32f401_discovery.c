@@ -827,7 +827,7 @@ int32_t BlueNRG_SPI_Write(uint8_t* data1, uint8_t* data2, uint8_t Nb_bytes1, uin
   unsigned char header_master[5] = {0x0a, 0x00, 0x00, 0x00, 0x00};
   unsigned char header_slave[5]  = {0xaa, 0x00, 0x00, 0x00, 0x00};
 
-  //Disable_SPI_IRQ();
+  HAL_NVIC_DisableIRQ(BLUENRG_IRQ_EXTI_IRQn);
 
 #if ENABLE_SPI_FIX
   GPIO_InitTypeDef  GPIO_InitStruct;
@@ -837,6 +837,7 @@ int32_t BlueNRG_SPI_Write(uint8_t* data1, uint8_t* data2, uint8_t Nb_bytes1, uin
   GPIO_InitStruct.Pull  = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
   HAL_GPIO_Init(BLUENRG_IRQ_GPIO_PORT, &GPIO_InitStruct);
+  HAL_Delay(1);
 
   /* Pull IRQ high */
   HAL_GPIO_WritePin(BLUENRG_IRQ_GPIO_PORT, BLUENRG_IRQ_PIN, GPIO_PIN_SET);
@@ -872,7 +873,7 @@ int32_t BlueNRG_SPI_Write(uint8_t* data1, uint8_t* data2, uint8_t Nb_bytes1, uin
   }
 
   HAL_GPIO_WritePin(BLUENRG_CS_GPIO_PORT, BLUENRG_CS_PIN, GPIO_PIN_SET);
-  //Enable_SPI_IRQ();
+  HAL_NVIC_EnableIRQ(BLUENRG_IRQ_EXTI_IRQn);
   return result;
 }
 

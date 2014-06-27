@@ -277,6 +277,7 @@ typedef enum
 #define BLUENRG_IRQ_GPIO_CLK_ENABLE()     __GPIOA_CLK_ENABLE()
 #define BLUENRG_IRQ_GPIO_CLK_DISABLE()    __GPIOA_CLK_DISABLE()
 #define BLUENRG_IRQ_PIN                   GPIO_PIN_1                /* PA.01 */
+#define BLUENRG_IRQ_EXTI_IRQn             EXTI1_IRQn
 
 #define BLUENRG_RESET_GPIO_PORT           GPIOB
 #define BLUENRG_RESET_GPIO_CLK_ENABLE()   __GPIOB_CLK_ENABLE()

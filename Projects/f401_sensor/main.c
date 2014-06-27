@@ -119,9 +119,8 @@ static void HW_Init(void)
 
   BLUENRG_IRQ_GPIO_CLK_ENABLE();
   GPIO_InitStruct.Pin   = BLUENRG_IRQ_PIN;
-  GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull  = GPIO_PULLDOWN;
-  GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+  GPIO_InitStruct.Mode  = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull  = GPIO_NOPULL;
   HAL_GPIO_Init(BLUENRG_IRQ_GPIO_PORT, &GPIO_InitStruct);
 
 #ifdef WITH_USART
@@ -162,6 +161,11 @@ static void BlueNRG_Init()
 
   BSP_LED_On(LED3);
   HCI_Init();
+
+  /* Enable and set EXTI for BlueNRG IRQ */
+  HAL_NVIC_SetPriority(BLUENRG_IRQ_EXTI_IRQn, 2, 0);
+  HAL_NVIC_EnableIRQ(BLUENRG_IRQ_EXTI_IRQn);
+
   BlueNRG_RST();
 
   BSP_LED_On(LED4);
@@ -247,6 +251,27 @@ int main(void)
 void SysTick_Handler(void)
 {
   HAL_IncTick();
+}
+
+/**
+ * @brief EXTI line detection callbacks
+ * @param GPIO_Pin: Specifies the pins connected EXTI line
+ * @retval None
+ */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if (GPIO_Pin == BLUENRG_IRQ_PIN)
+    HCI_Isr();
+}
+
+/**
+ * @brief  This function handles External line 0 interrupt request.
+ * @param  None
+ * @retval None
+ */
+void EXTI1_IRQHandler(void)
+{
+  HAL_GPIO_EXTI_IRQHandler(BLUENRG_IRQ_PIN);
 }
 
 int connected = FALSE;

@@ -53,10 +53,9 @@
 #define MIN(a,b)            ((a) < (b) )? (a) : (b)
 #define MAX(a,b)            ((a) > (b) )? (a) : (b)
 
-/* winfred FIXME */
-#define Disable_SPI_IRQ()
-#define Enable_SPI_IRQ()
-#define Clear_SPI_EXTI_Flag()
+#define Disable_SPI_IRQ()	HAL_NVIC_DisableIRQ(BLUENRG_IRQ_EXTI_IRQn);
+#define Enable_SPI_IRQ()	HAL_NVIC_EnableIRQ(BLUENRG_IRQ_EXTI_IRQn);
+#define Clear_SPI_EXTI_Flag()	__HAL_GPIO_EXTI_CLEAR_FLAG(BLUENRG_IRQ_EXTI_IRQn);
 
 static void enqueue_packet(tHciDataPacket * hciReadPacket);
 
