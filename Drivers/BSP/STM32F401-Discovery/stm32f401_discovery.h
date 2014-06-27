@@ -268,6 +268,11 @@ typedef enum
   */
 
 /*##################### BlueNRG ##########################*/
+#define BLUENRG_CS_GPIO_PORT              GPIOE
+#define BLUENRG_CS_GPIO_CLK_ENABLE()      __GPIOE_CLK_ENABLE()
+#define BLUENRG_CS_GPIO_CLK_DISABLE()     __GPIOE_CLK_DISABLE()
+#define BLUENRG_CS_PIN                    GPIO_PIN_6                /* PE.06 */
+
 #define BLUENRG_IRQ_GPIO_PORT             GPIOA
 #define BLUENRG_IRQ_GPIO_CLK_ENABLE()     __GPIOA_CLK_ENABLE()
 #define BLUENRG_IRQ_GPIO_CLK_DISABLE()    __GPIOA_CLK_DISABLE()

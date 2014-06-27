@@ -101,7 +101,15 @@ static void HW_Init(void)
   /* Init on-board AccelMag */
   BSP_ACCELERO_Init();
 
-  /* Init BlueNRG Reset and IRQ pin */
+  /* Init BlueNRG CS, Reset, and IRQ pin */
+  BLUENRG_CS_GPIO_CLK_ENABLE();
+  GPIO_InitStruct.Pin   = BLUENRG_CS_PIN;
+  GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull  = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+  HAL_GPIO_Init(BLUENRG_CS_GPIO_PORT, &GPIO_InitStruct);
+  HAL_GPIO_WritePin(BLUENRG_CS_GPIO_PORT, BLUENRG_CS_PIN, GPIO_PIN_SET);
+
   BLUENRG_RESET_GPIO_CLK_ENABLE();
   GPIO_InitStruct.Pin   = BLUENRG_RESET_PIN;
   GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
@@ -218,7 +226,7 @@ int main(void)
 
   HAL_Init();
   HW_Init();
-  //BlueNRG_Init();
+  BlueNRG_Init();
 
   while (1)
   {

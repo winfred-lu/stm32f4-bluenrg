@@ -789,6 +789,8 @@ int32_t BlueNRG_SPI_Read_All(uint8_t *buffer, uint8_t buff_size)
   uint8_t header_master[5] = {0x0b, 0x00, 0x00, 0x00, 0x00};
   uint8_t header_slave[5];
 
+  HAL_GPIO_WritePin(BLUENRG_CS_GPIO_PORT, BLUENRG_CS_PIN, GPIO_PIN_RESET);
+
   /* Read the header */
   for (i = 0; i < 5; i++)
     header_slave[i] = SPIx_WriteRead(header_master[i]);
@@ -804,6 +806,8 @@ int32_t BlueNRG_SPI_Read_All(uint8_t *buffer, uint8_t buff_size)
         buffer[len] = SPIx_WriteRead(0xFF);
     }
   }
+
+  HAL_GPIO_WritePin(BLUENRG_CS_GPIO_PORT, BLUENRG_CS_PIN, GPIO_PIN_SET);
   return len;
 }
 
@@ -839,6 +843,8 @@ int32_t BlueNRG_SPI_Write(uint8_t* data1, uint8_t* data2, uint8_t Nb_bytes1, uin
   HAL_Delay(1);
 #endif
 
+  HAL_GPIO_WritePin(BLUENRG_CS_GPIO_PORT, BLUENRG_CS_PIN, GPIO_PIN_RESET);
+
   for (i = 0; i < 5; i++)
     header_slave[i] = SPIx_WriteRead(header_master[i]);
 
@@ -865,6 +871,7 @@ int32_t BlueNRG_SPI_Write(uint8_t* data1, uint8_t* data2, uint8_t Nb_bytes1, uin
     result = -1;
   }
 
+  HAL_GPIO_WritePin(BLUENRG_CS_GPIO_PORT, BLUENRG_CS_PIN, GPIO_PIN_SET);
   //Enable_SPI_IRQ();
   return result;
 }
