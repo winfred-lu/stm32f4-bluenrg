@@ -292,7 +292,6 @@ int hci_send_req(struct hci_request *r)
 	hci_event_pckt *event_pckt;
 	hci_uart_pckt *hci_hdr;
 	int try;
-    int to = 10; /* DEFAULT_TIMEOUT */
 
 	new_packet = FALSE;
 	hci_set_packet_complete_callback(new_hci_event);
@@ -305,35 +304,22 @@ int hci_send_req(struct hci_request *r)
 		evt_cmd_status *cs;
 		evt_le_meta_event *me;
 		int len;
+		int to = 12;
 
-        /* Minimum timeout is 1. */
-        if(to == 0)
-            to = 1;
-
-		if (to > 0) {
-            /* winfred FIXME
-			struct timer t;
-			Timer_Set(&t, to);
-            */
-
-			while(1){
-                /* winfred FIXME
-				if(Timer_Expired(&t)){
-					goto failed;
-				}
-                */
-				if(new_packet){
-					break;
-				}
-			}
+		while (to--) {
+			if (new_packet)
+				break;
+			if (1 == to)
+				goto failed;
+			HAL_Delay(50);
 		}
 
 		hci_hdr = (void *)hci_buffer;
 		if(hci_hdr->type != HCI_EVENT_PKT){
-            new_packet = FALSE;
-            Enable_SPI_IRQ();
-            continue;
-        }
+			new_packet = FALSE;
+			Enable_SPI_IRQ();
+			continue;
+		}
 
 		event_pckt = (void *) (hci_hdr->data);
 
