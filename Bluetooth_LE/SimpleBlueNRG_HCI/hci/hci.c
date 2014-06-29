@@ -255,7 +255,14 @@ void hci_write(void* data1, void* data2, uint32_t n_bytes1, uint32_t n_bytes2)
     PRINTF("\n");
 #endif
 
-	BlueNRG_SPI_Write(data1, data2, n_bytes1, n_bytes2);
+    int i = 10;
+    while (--i) {
+        if (BlueNRG_SPI_Write(data1, data2, n_bytes1, n_bytes2) == 0)
+            break;
+        HAL_Delay(10);
+    }
+    if (0 == i)
+        ; /* winfred TODO */
 }
 
 int hci_send_cmd(uint16_t ogf, uint16_t ocf, uint8_t plen, void *param)
