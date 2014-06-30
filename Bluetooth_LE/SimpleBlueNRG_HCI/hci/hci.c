@@ -55,7 +55,7 @@
 
 #define Disable_SPI_IRQ()	HAL_NVIC_DisableIRQ(BLUENRG_IRQ_EXTI_IRQn);
 #define Enable_SPI_IRQ()	HAL_NVIC_EnableIRQ(BLUENRG_IRQ_EXTI_IRQn);
-#define Clear_SPI_EXTI_Flag()	__HAL_GPIO_EXTI_CLEAR_FLAG(BLUENRG_IRQ_EXTI_IRQn);
+#define Clear_SPI_EXTI_Flag()
 
 static void enqueue_packet(tHciDataPacket * hciReadPacket);
 
@@ -115,9 +115,9 @@ void HCI_Input(tHciDataPacket * hciReadPacket)
             if(byte == HCI_EVENT_PKT){
                  state = WAITING_EVENT_CODE;
             }
-//            else if(byte == HCI_ACLDATA_PKT){
-//                state = WAITING_HANDLE;
-//            }
+            /*else if(byte == HCI_ACLDATA_PKT){
+                state = WAITING_HANDLE;
+            }*/
             else{
                 /* Incorrect type. Reset state machine. */
                 state = WAITING_TYPE;
@@ -224,17 +224,17 @@ void HCI_Isr(void)
 
       data_len = BlueNRG_SPI_Read_All(hciReadPacket->dataBuff,HCI_PACKET_SIZE);
       if(data_len > 0){
-	HCI_Input(hciReadPacket);
-	// Packet will be inserted to te correct queue by
+        /* Packet will be inserted to te correct queue by */
+        HCI_Input(hciReadPacket);
       }
       else {
-	// Insert the packet back into the pool.
-	list_insert_head(&hciReadPktPool, (tListNode *)hciReadPacket);
+        /* Insert the packet back into the pool. */
+        list_insert_head(&hciReadPktPool, (tListNode *)hciReadPacket);
       }
 
     }
     else{
-      // HCI Read Packet Pool is empty, wait for a free packet.
+      /* HCI Read Packet Pool is empty, wait for a free packet. */
       readPacketListFull = TRUE;
       Clear_SPI_EXTI_Flag();
       return;
@@ -259,7 +259,6 @@ void hci_write(void* data1, void* data2, uint32_t n_bytes1, uint32_t n_bytes2)
     while (--i) {
         if (BlueNRG_SPI_Write(data1, data2, n_bytes1, n_bytes2) == 0)
             break;
-        HAL_Delay(10);
     }
     if (0 == i)
         ; /* winfred TODO */
