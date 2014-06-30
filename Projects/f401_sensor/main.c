@@ -32,6 +32,7 @@
 
 #include "hci_internal.h"
 #include "bluenrg_hci_internal.h"
+#include "gap.h"
 #include "sm.h"
 
 #ifdef WITH_VCP
@@ -42,6 +43,12 @@
 
 USBD_HandleTypeDef hUSBDDevice;
 #endif
+
+
+int connected = FALSE;
+volatile uint8_t set_connectable = 1;
+tHalUint16 connection_handle = 0;
+
 
 #ifdef WITH_USART
 USART_HandleTypeDef UsartHandle;
@@ -213,7 +220,32 @@ static void BlueNRG_Init()
     BSP_LED_Toggle(LED4);
   }
 
+  /* sensors have been initialized in HW_Init() */
+
   BSP_LED_Off(LED5);
+  rc = Add_Acc_Service();
+  while (rc) {
+    HAL_Delay(100);
+    BSP_LED_Toggle(LED5);
+  }
+
+  BSP_LED_Off(LED6);
+  rc = Add_Environmental_Sensor_Service();
+  while (rc) {
+    HAL_Delay(100);
+    BSP_LED_Toggle(LED6);
+  }
+
+  /* Init_User_Timer();
+  Start_User_Timer(); */
+
+  BSP_LED_On(LED3);
+  /* -2 dBm output power */
+  rc = aci_hal_set_tx_power_level(1, 4);
+  while (rc) {
+    HAL_Delay(100);
+    BSP_LED_Toggle(LED3);
+  }
 }
 
 /**
@@ -234,11 +266,20 @@ int main(void)
 
   while (1)
   {
-    /* Blink the orange LED */
-    HAL_Delay(500);
-    BSP_LED_Toggle(LED3);
+    HCI_Process();
+    if (set_connectable) {
+      set_bluenrg_connectable();
+      set_connectable = 0;
+    }
 
-    BSP_ACCELERO_GetXYZ(accData);
+    /* Blink the orange LED */
+    if (HAL_GetTick() % 500 == 0)
+      BSP_LED_Toggle(LED3);
+
+    if (HAL_GetTick() % 100 == 0) {
+      BSP_ACCELERO_GetXYZ(accData);
+      Acc_Update(accData);
+    }
 
 #ifdef WITH_USART
     msg[0] = (msg[0] == '9')? '0' : msg[0]+1;
@@ -274,9 +315,34 @@ void EXTI1_IRQHandler(void)
   HAL_GPIO_EXTI_IRQHandler(BLUENRG_IRQ_PIN);
 }
 
-int connected = FALSE;
-volatile uint8_t set_connectable = 1;
-tHalUint16 connection_handle = 0;
+/**
+ * @brief  This function puts the device in connectable mode.
+ * @note   If you want to specify a UUID list in the advertising data, those data
+ *         can be specified as a parameter in aci_gap_set_discoverable().
+ *         For manufacture data, aci_gap_update_adv_data must be called.
+ *         Ex.:
+ *           tBleStatus ret;
+ *           const char local_name[] = {AD_TYPE_COMPLETE_LOCAL_NAME,'B','l','u','e','N','R','G'};
+ *           const uint8_t serviceUUIDList[] = {AD_TYPE_16_BIT_SERV_UUID, 0x34, 0x12};
+ *           const uint8_t manuf_data[] = {4, AD_TYPE_MANUFACTURER_SPECIFIC_DATA, 0x05, 0x02, 0x01};
+ *           ret = aci_gap_set_discoverable(ADV_IND, 0, 0, RANDOM_ADDR, NO_WHITE_LIST_USE,
+ *                                          8, local_name, 3, serviceUUIDList, 0, 0);
+ *           ret = aci_gap_update_adv_data(5, manuf_data);
+ */
+void set_bluenrg_connectable(void)
+{
+  tBleStatus ret;
+  const char local_name[] = {AD_TYPE_COMPLETE_LOCAL_NAME,'B','l','u','e','N','R','G'};
+
+  /* disable scan response */
+  hci_le_set_scan_resp_data(0, NULL);
+  /*PRINTF("General Discoverable Mode.\n");*/
+
+  ret = aci_gap_set_discoverable(ADV_IND, 0, 0, RANDOM_ADDR, NO_WHITE_LIST_USE,
+                                 8, local_name, 0, NULL, 0, 0);
+  if (ret != 0)
+    BSP_LED_On(LED4);
+}
 
 void GAP_DisconnectionComplete_CB(void)
 {
