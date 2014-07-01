@@ -1,0 +1,33 @@
+* Introduction
+  This is a sensor demo project for STM32F401 Discovery board in conjunction with a BlueNRG module.
+
+  The BlueNRG app allows you to access the sensor data directly from the mobile device via Bluetooth Low Energy protocol.
+
+* Requirements
+** Hardware
+   Two devices are needed:
+   - [[http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/LN1199/PF259098icmp%3Dstm32f401discovery_pron_footer_jan2014&sc%3Dstm32f401discovery][32F401CDiscovery]]
+   - The BlueNRG module (daughter board of [[http://www.st.com/web/en/catalog/tools/PF259562][STEVAL-IDB002V1]])
+
+   The connection between F401CDiscovery and BlueNRG board is 5-wire SPI, which is a standard 4-wire SPI with an additional IRQ pin. The IRQ pin is for BlueNRG module to notify F401CDiscovery to receive packets.
+
+** Software
+   - GNU toolchain
+     the [[https://releases.linaro.org/latest/components/toolchain/binaries/][latest bare matel linaro GNU toolchain]] is known to work
+   - Flash tool: [[http://openocd.sourceforge.net/][openocd]] or [[https://github.com/texane/stlink][stlink]]
+   - BlueNRG app
+   - (optional) [[https://itunes.apple.com/us/app/lightblue-bluetooth-low-energy/id557428110mt%3D8][LightBlue]]
+
+   BlueNRG app is available for both Android and iPhone:
+   - [[https://play.google.com/store/apps/detailsid%3Dcom.st.bluenrg][Google play BlueNRG]]
+   - [[https://itunes.apple.com/us/app/bluenrg/id705873549mt%3D8][iTunes BlueNRG]]
+
+* Build and Run
+  #+BEGIN_EXAMPLE
+    make
+    make flash
+  #+END_EXAMPLE
+
+  Start the BlueNRG app and connect.
+
+  Demo video (TBC)
