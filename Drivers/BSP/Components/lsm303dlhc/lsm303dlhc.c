@@ -214,7 +214,7 @@ void LSM303DLHC_AccReadXYZ(int16_t* pData)
   uint8_t ctrlx[2]={0,0};
   int8_t buffer[6];
   uint8_t i = 0;
-  uint8_t sensitivity = LSM303DLHC_ACC_SENSITIVITY_2G;
+  uint8_t shift = 1;
 
   /* Read the acceleration control register content */
   ctrlx[0] = COMPASSACCELERO_IO_Read(ACC_I2C_ADDRESS, LSM303DLHC_CTRL_REG4_A);
@@ -249,23 +249,23 @@ void LSM303DLHC_AccReadXYZ(int16_t* pData)
   switch(ctrlx[0] & LSM303DLHC_FULLSCALE_16G)
   {
   case LSM303DLHC_FULLSCALE_2G:
-    sensitivity = LSM303DLHC_ACC_SENSITIVITY_2G;
+    shift = 4;
     break;
   case LSM303DLHC_FULLSCALE_4G:
-    sensitivity = LSM303DLHC_ACC_SENSITIVITY_4G;
+    shift = 3;
     break;
   case LSM303DLHC_FULLSCALE_8G:
-    sensitivity = LSM303DLHC_ACC_SENSITIVITY_8G;
+    shift = 2;
     break;
   case LSM303DLHC_FULLSCALE_16G:
-    sensitivity = LSM303DLHC_ACC_SENSITIVITY_16G;
+    shift = 1;
     break;
   }
 
   /* Obtain the mg value for the three axis */
-  for(i=0; i<3; i++)
+  for (i=0; i<3; i++)
   {
-    pData[i]=(pnRawData[i] * sensitivity);
+    pData[i] = pnRawData[i] >> shift;
   }
 
 }
