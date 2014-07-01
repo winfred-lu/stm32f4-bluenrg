@@ -26,7 +26,6 @@
 #include "hci_internal.h"
 #include "hal.h"
 
-#define SENSOR_EMULATION
 #ifndef DEBUG
 #define DEBUG 0
 #endif
@@ -318,64 +317,52 @@ tBleStatus Humidity_Update(uint16_t humidity)
     return BLE_STATUS_SUCCESS;
 }
 
+int LSM303DLHC_TempRead(int16_t *refvalue);
 void Read_Request_CB(tHalUint16 handle)
 {
-    int16_t data[3];
     int response = 1;
 
-    if(handle == accCharHandle + 1){
+    if (handle == accCharHandle + 1) {
+        int16_t data[3];
         BSP_ACCELERO_GetXYZ(data);
         Acc_Update(data);
     }
-    else if(handle == tempCharHandle + 1){
+    else if (handle == tempCharHandle + 1) {
         int16_t data;
 #ifdef SENSOR_EMULATION
         data = 270 + ((uint64_t)rand()*15)/RAND_MAX;
 #else
-        if (0) {
-            response = Lps25hStartNReadTemperature(&data);
-        }
-        else {
-            response = STLM75_Read_Temperature_Signed(&data);
-        }
+        response = LSM303DLHC_TempRead(&data);
 #endif
-
-        if(response){
+        if (response)
             Temp_Update(data);
-        }
-        else{
+        else {
             PRINTF("Temp Error\n");
-
 #if !defined(ST_OTA_BTL) && !defined(ST_OTA_BASIC_APPLICATION)
             BSP_LED_On(LED5);
 #endif
         }
     }
-    else if(handle == pressCharHandle + 1){
-        int32_t data;
-        /* winfred FIXME
-        struct timer t;
-        Timer_Set(&t, CLOCK_SECOND/10); */
-
+    else if (handle == pressCharHandle + 1) {
+        int32_t data = 0;
 #ifdef SENSOR_EMULATION
         data = 100000 + ((uint64_t)rand()*1000)/RAND_MAX;
 #else
-        response = Lps25hReadPressure(&data);
+        response = 0; /* winfred TODO : get pressure sensor data */
 #endif
-        if(response)
+        if (response)
             Press_Update(data);
     }
-    else if(handle == humidityCharHandle + 1){
-        uint16_t data;
+    else if (handle == humidityCharHandle + 1) {
+        uint16_t data = 0;
 #ifdef SENSOR_EMULATION
         data = 450 + ((uint64_t)rand()*100)/RAND_MAX;
 #else
-        HTS221_Read_Humidity(&data);
+        response = 0; /* winfred TODO : get humidity sensor data */
 #endif
-        if(response){
+        if (response)
             Humidity_Update(data);
-        }
-        else{
+        else {
             PRINTF("HTS221 Error\n");
 #if !defined(ST_OTA_BTL) && !defined(ST_OTA_BASIC_APPLICATION)
             BSP_LED_On(LED5);
@@ -383,6 +370,6 @@ void Read_Request_CB(tHalUint16 handle)
         }
     }
 
-    if(connection_handle !=0)
+    if (connection_handle != 0)
         aci_gatt_allow_read(connection_handle);
 }

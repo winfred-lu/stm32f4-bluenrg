@@ -124,6 +124,11 @@ void LSM303DLHC_AccInit(uint16_t InitStruct)
   /* Write value to ACC MEMS CTRL_REG4 register */
   ctrl = (uint8_t) (InitStruct >> 8);
   COMPASSACCELERO_IO_Write(ACC_I2C_ADDRESS, LSM303DLHC_CTRL_REG4_A, ctrl);
+
+  /* We enable temperature sensor secretly */
+  COMPASSACCELERO_IO_Write(MAG_I2C_ADDRESS, LSM303DLHC_CRA_REG_M, 0x80);
+  COMPASSACCELERO_IO_Write(MAG_I2C_ADDRESS, LSM303DLHC_MR_REG_M, 0);
+  /* winfred TODO : Fix LSM303DLHC_Mag series functions and use them */
 }
 
 /**
@@ -189,7 +194,7 @@ void LSM303DLHC_AccFilterConfig(uint8_t FilterStruct)
   * @retval None
   */
 void LSM303DLHC_AccFilterCmd(uint8_t HighPassFilterState)
- {
+{
   uint8_t tmpreg;
 
   /* Read CTRL_REG2 register */
@@ -205,7 +210,7 @@ void LSM303DLHC_AccFilterCmd(uint8_t HighPassFilterState)
 
 /**
   * @brief  Read X, Y & Z Accelration values
-* @param  pfData : Data out pointer
+  * @param  pfData : Data out pointer
   * @retval None
   */
 void LSM303DLHC_AccReadXYZ(int16_t* pData)
@@ -267,7 +272,6 @@ void LSM303DLHC_AccReadXYZ(int16_t* pData)
   {
     pData[i] = pnRawData[i] >> shift;
   }
-
 }
 
 /**
@@ -279,7 +283,7 @@ void LSM303DLHC_AccReadXYZ(int16_t* pData)
   * @retval None
   */
 void LSM303DLHC_AccFilterClickCmd(uint8_t HighPassFilterClickState)
- {
+{
   uint8_t tmpreg = 0x00;
 
   /* Read CTRL_REG2 register */
@@ -554,6 +558,26 @@ void LSM303DLHC_AccZClickITConfig(void)
   /* Enable simple click IT on Z axis, */
   LSM303DLHC_AccClickITEnable(LSM303DLHC_Z_SINGLE_CLICK);
 
+}
+
+/**
+ * @brief  Read temperature data
+ * @param  refvalue : Temperature data
+ * @retval 1 if success, 0 if not.
+ */
+int LSM303DLHC_TempRead(int16_t *refvalue)
+{
+  uint8_t reg[2];
+  int16_t value;
+
+  /* Read the temperature out register content */
+  reg[0] = COMPASSACCELERO_IO_Read(MAG_I2C_ADDRESS, LSM303DLHC_TEMP_OUT_H_M);
+  reg[1] = COMPASSACCELERO_IO_Read(MAG_I2C_ADDRESS, LSM303DLHC_TEMP_OUT_L_M);
+
+  /* 8LSB/deg - 12-bit resolution */
+  value = ((int8_t)reg[0] << 4) | (reg[1] >> 4);
+  *refvalue = value >> 3;
+  return 1;
 }
 
 #ifdef MAGNET
