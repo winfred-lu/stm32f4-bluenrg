@@ -796,10 +796,10 @@ int32_t BlueNRG_SPI_Read_All(uint8_t *buffer, uint8_t buff_size)
     header_slave[i] = SPIx_WriteRead(header_master[i]);
 
   if (header_slave[0] == 0x02) {
-    // device is ready
+    /* device is ready */
     byte_count = (header_slave[4] << 8) | header_slave[3];
     if (byte_count > 0) {
-      // avoid to read more data that size of the buffer
+      /* avoid to read more data that size of the buffer */
       if (byte_count > buff_size)
         byte_count = buff_size;
       for (len = 0; len < byte_count; len++)
@@ -856,19 +856,19 @@ int32_t BlueNRG_SPI_Write(uint8_t* data1, uint8_t* data2, uint8_t Nb_bytes1, uin
 #endif
 
   if (header_slave[0] == 0x02) {
-    // SPI is ready
+    /* SPI is ready */
     if (header_slave[1] >= (Nb_bytes1 + Nb_bytes2)) {
-      // Buffer is big enough
+      /* Buffer is big enough */
       for (i = 0; i < Nb_bytes1; i++)
         SPIx_WriteRead(*(data1 + i));
       for (i = 0; i < Nb_bytes2; i++)
         SPIx_WriteRead(*(data2 + i));
     } else {
-      // Buffer is too small
+      /* Buffer is too small */
       result = -2;
     }
   } else {
-    // SPI is not ready
+    /* SPI is not ready */
     result = -1;
   }
 

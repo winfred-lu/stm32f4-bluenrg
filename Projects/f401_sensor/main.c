@@ -34,6 +34,7 @@
 #include "bluenrg_hci_internal.h"
 #include "gap.h"
 #include "sm.h"
+#include "gatt_db.h"
 
 #ifdef WITH_VCP
 #include "usbd_core.h"
@@ -48,6 +49,7 @@ USBD_HandleTypeDef hUSBDDevice;
 int connected = FALSE;
 volatile uint8_t set_connectable = 1;
 tHalUint16 connection_handle = 0;
+void set_bluenrg_connectable(void);
 
 
 #ifdef WITH_USART
@@ -364,7 +366,6 @@ void GAP_ConnectionComplete_CB(tHalUint8 addr[6], tHalUint16 handle)
   */
 }
 
-void Read_Request_CB(tHalUint16 handle);
 void HCI_Event_CB(void *pckt)
 {
   hci_uart_pckt *hci_pckt = pckt;
