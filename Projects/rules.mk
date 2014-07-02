@@ -86,7 +86,7 @@ flash:
 	-c "reset init" \
 	-c "flash probe 0" \
 	-c "flash info 0" \
-	-c "flash write_image erase sensor.bin 0x8000000" \
+	-c "flash write_image erase $(shell ls *.bin) 0x8000000" \
 	-c "reset run" -c shutdown
 
 .PHONY: clean
