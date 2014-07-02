@@ -40,16 +40,16 @@
 #define __CS43l22_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "..\Common\audio.h"
+#include "../Common/audio.h"
 
 /** @addtogroup BSP
   * @{
-  */ 
+  */
 
 /** @addtogroup Component
   * @{
-  */ 
-  
+  */
+
 /** @addtogroup CS43122
   * @{
   */
@@ -64,7 +64,7 @@
 
 /** @defgroup CS43122_Exported_Constants
   * @{
-  */ 
+  */
 
 /******************************************************************************/
 /***************************  Codec User defines ******************************/
@@ -94,9 +94,9 @@
 /******************************************************************************/
 /****************************** REGISTER MAPPING ******************************/
 /******************************************************************************/
-/** 
-  * @brief  CS43L22 ID  
-  */  
+/**
+  * @brief  CS43L22 ID
+  */
 #define  CS43L22_ID            0xE0
 #define  CS43L22_ID_MASK       0xF8
 /**
@@ -106,7 +106,7 @@
   *  [7:3] CHIPID[4:0]: I.D. code for the CS43L22.
   *        Default value: 11100b
   *  [2:0] REVID[2:0]: CS43L22 revision level.
-  *        Default value: 
+  *        Default value:
   *        000 - Rev A0
   *        001 - Rev A1
   *        010 - Rev B0
@@ -116,7 +116,7 @@
 
 /**
   * @}
-  */ 
+  */
 
 /** @defgroup CS43122_Exported_Macros
   * @{
@@ -124,14 +124,14 @@
 #define VOLUME_CONVERT(Volume)    (((Volume) > 100)? 100:((uint8_t)(((Volume) * 255) / 100)))
 /**
   * @}
-  */ 
+  */
 
 /** @defgroup CS43122_Exported_Functions
   * @{
   */
-    
+
 /*------------------------------------------------------------------------------
-                           Audio Codec functions 
+                           Audio Codec functions
 ------------------------------------------------------------------------------*/
 /* High Layer codec functions */
 uint32_t cs43l22_Init(uint16_t DeviceAddr, uint16_t OutputDevice, uint8_t Volume, uint32_t AudioFreq);
@@ -157,11 +157,7 @@ extern AUDIO_DrvTypeDef   cs43l22_drv;
 
 /**
   * @}
-  */ 
-
-/**
-  * @}
-  */ 
+  */
 
 /**
   * @}
@@ -169,6 +165,10 @@ extern AUDIO_DrvTypeDef   cs43l22_drv;
 
 /**
   * @}
-  */ 
+  */
+
+/**
+  * @}
+  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

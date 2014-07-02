@@ -34,7 +34,7 @@
   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
   ******************************************************************************
-  */ 
+  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __STM32F401_DISCOVERY_AUDIO_H
@@ -42,13 +42,13 @@
 
 #ifdef __cplusplus
  extern "C" {
-#endif 
+#endif
 
 /* Includes ------------------------------------------------------------------*/
 /* Include audio component Driver */
-#include "..\Components\cs43l22\cs43l22.h"
+#include "../Components/cs43l22/cs43l22.h"
 #include "stm32f401_discovery.h"
-#include "..\..\..\Middlewares\ST\STM32_Audio\Addons\PDM\pdm_filter.h"
+#include "../../../Middlewares/ST/STM32_Audio/Addons/PDM/pdm_filter.h"
 
 /** @addtogroup BSP
   * @{
@@ -57,23 +57,23 @@
 /** @addtogroup STM32F401_DISCOVERY
   * @{
   */
-    
+
 /** @defgroup STM32F401_DISCOVERY_AUDIO STM32F401 DISCOVERY AUDIO
   * @{
-  */    
+  */
 
 
-/** @defgroup STM32F401_DISCOVERY_AUDIO_Exported_Types AUDIO_Exported_Types 
+/** @defgroup STM32F401_DISCOVERY_AUDIO_Exported_Types AUDIO_Exported_Types
   * @{
   */
 
 /**
   * @}
-  */ 
+  */
 
-/** @defgroup STM32F401_DISCOVERY_AUDIO_OUT_Exported_Constants AUDIO_OUT_Exported_Constants 
+/** @defgroup STM32F401_DISCOVERY_AUDIO_OUT_Exported_Constants AUDIO_OUT_Exported_Constants
   * @{
-  */ 
+  */
 
 
 /*------------------------------------------------------------------------------
@@ -132,9 +132,9 @@
 #define I2S2_DMAx_IRQ                 DMA1_Stream3_IRQn
 #define I2S2_DMAx_PERIPH_DATA_SIZE    DMA_PDATAALIGN_HALFWORD
 #define I2S2_DMAx_MEM_DATA_SIZE       DMA_MDATAALIGN_HALFWORD
-   
+
 #define I2S2_IRQHandler               DMA1_Stream3_IRQHandler
-  
+
 /* Select the interrupt preemption priority and subpriority for the IT/DMA interrupt */
 #define AUDIO_IN_IRQ_PREPRIO                    6   /* Select the preemption priority level(0 is the highest) */
 
@@ -144,7 +144,7 @@
 
 #define AUDIODATA_SIZE      2   /* 16-bits audio data size */
 
-/* Audio status definition */     
+/* Audio status definition */
 #define AUDIO_OK                              0
 #define AUDIO_ERROR                           1
 #define AUDIO_TIMEOUT                         2
@@ -160,7 +160,7 @@
 /* PCM buffer output size */
 #define PCM_OUT_SIZE                          DEFAULT_AUDIO_IN_FREQ/1000
 #define CHANNEL_DEMUX_MASK                    0x55
-   
+
 /*------------------------------------------------------------------------------
                     OPTIONAL Configuration defines parameters
 ------------------------------------------------------------------------------*/
@@ -168,15 +168,15 @@
 
 /**
   * @}
-  */ 
+  */
 
-/** @defgroup STM32F4_DISCOVERY_AUDIO_Exported_Variables AUDIO_Exported_Variables 
+/** @defgroup STM32F4_DISCOVERY_AUDIO_Exported_Variables AUDIO_Exported_Variables
   * @{
-  */ 
+  */
 extern __IO uint16_t AudioInVolume;
 /**
   * @}
-  */ 
+  */
 
 /** @defgroup STM32F401_DISCOVERY_AUDIO_Exported_Macros AUDIO_Exported_Macros
   * @{
@@ -187,9 +187,9 @@ extern __IO uint16_t AudioInVolume;
   * @}
   */
 
-/** @defgroup STM32F401_DISCOVERY_AUDIO_OUT_Exported_Functions AUDIO_OUT_Exported_Functions 
+/** @defgroup STM32F401_DISCOVERY_AUDIO_OUT_Exported_Functions AUDIO_OUT_Exported_Functions
   * @{
-  */ 
+  */
 uint8_t        BSP_AUDIO_OUT_Init(uint16_t OutputDevice, uint8_t Volume, uint32_t AudioFreq);
 uint8_t        BSP_AUDIO_OUT_Play(uint16_t* pBuffer, uint32_t Size);
 void            BSP_AUDIO_OUT_ChangeBuffer(uint16_t *pData, uint16_t Size);
@@ -218,7 +218,7 @@ void     BSP_AUDIO_OUT_Error_CallBack(void);
 
 /** @defgroup STM32F401_DISCOVERY_AUDIO_IN_Exported_Functions AUDIO_IN_Exported_Functions
   * @{
-  */ 
+  */
 uint8_t BSP_AUDIO_IN_Init(uint32_t AudioFreq, uint32_t BitRes, uint32_t ChnlNbr);
 uint8_t BSP_AUDIO_IN_Record(uint16_t *pData, uint32_t Size);
 uint8_t        BSP_AUDIO_IN_Stop(void);
@@ -239,11 +239,7 @@ void     BSP_AUDIO_IN_Error_Callback(void);
 
 /**
   * @}
-  */ 
-
-/**
-  * @}
-  */ 
+  */
 
 /**
   * @}
@@ -251,8 +247,12 @@ void     BSP_AUDIO_IN_Error_Callback(void);
 
 /**
   * @}
-  */ 
-   
+  */
+
+/**
+  * @}
+  */
+
 #ifdef __cplusplus
 }
 #endif
