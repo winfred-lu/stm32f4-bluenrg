@@ -21,12 +21,12 @@ void _exit(int status)
 */
 caddr_t _sbrk(int incr)
 {
-	extern char _ebss;
+	extern char _end;
 	static char *heap_end;
 	char *prev_heap_end;
 
 	if (heap_end == 0) {
-		heap_end = &_ebss;
+		heap_end = &_end;
 	}
 	prev_heap_end = heap_end;
 
