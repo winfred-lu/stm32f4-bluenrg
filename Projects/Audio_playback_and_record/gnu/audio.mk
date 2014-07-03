@@ -50,7 +50,7 @@ ADIO_OBJS = \
 	$(ADIO_DIR)/Src/waverecorder.o
 
 ADIO_OBJS += \
-	$(ROOT_DIR)/Middlewares/ST/STM32_Audio/Addons/PDM/libPDMFilter_CM4_GCC.a
+	$(ROOT_DIR)/Middlewares/ST/STM32_Audio/Addons/PDM/libPDMFilter_CM4F_GCC.a
 
 audio: LDFLAGS += $(ADIO_LDFLAGS)
 audio: CFLAGS += $(ADIO_CFLAGS)
