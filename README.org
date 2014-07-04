@@ -1,7 +1,9 @@
 * Introduction
-  This is a sensor demo project for STM32F401 Discovery board in conjunction with a BlueNRG module.
+  [[https://github.com/winfred-lu/stm32f4-bluenrg][stm32f4-bluenrg]] is a sensor demo project for STM32F401 Discovery board in conjunction with a BlueNRG module.
 
-  The BlueNRG app allows you to access the sensor data directly from the mobile device via Bluetooth Low Energy protocol.
+  The BlueNRG app allows you to access the sensor data directly from the mobile device over Bluetooth Low Energy.
+
+  The STM32F401 Discovery creates a GATT (Generic Attribute Profile) vendor characteristic, and several services including the one reporting Accelerometer data. The mobile phone (BlueNRG app) connecting the board, aquires Accelerometer data, and visualizes it with a 3D cube.
 
 * Requirements
 ** Hardware
@@ -13,21 +15,30 @@
 
 ** Software
    - GNU toolchain
-     the [[https://releases.linaro.org/latest/components/toolchain/binaries/][latest bare matel linaro GNU toolchain]] is known to work
-   - Flash tool: [[http://openocd.sourceforge.net/][openocd]] or [[https://github.com/texane/stlink][stlink]]
-   - BlueNRG app
-   - (optional) [[https://itunes.apple.com/us/app/lightblue-bluetooth-low-energy/id557428110mt%3D8][LightBlue]]
+     The latest release ([[https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q2-update][4.8 currently]]) of [[https://launchpad.net/gcc-arm-embedded/%2Bdownload][GNU Tools for ARM Embedded Processor]] is known to work.
+   - Flash tool
+     Either [[http://openocd.sourceforge.net/][openocd]] or [[https://github.com/texane/stlink][stlink]] works.
+   - BlueNRG app (see below)
+   - (optional) [[https://itunes.apple.com/us/app/lightblue-bluetooth-low-energy/id557428110mt%3D8][LightBlue]], [[https://itunes.apple.com/us/app/ble-utility/id606210918mt%3D8][BLE Utility]]
+     Great BLE utilities for BLE developers.
 
    BlueNRG app is available for both Android and iPhone:
    - [[https://play.google.com/store/apps/detailsid%3Dcom.st.bluenrg][Google play BlueNRG]]
    - [[https://itunes.apple.com/us/app/bluenrg/id705873549mt%3D8][iTunes BlueNRG]]
 
-* Build and Run
+* Download, Build and Run
+  Clone the project:
   #+BEGIN_EXAMPLE
+    git clone https://github.com/winfred-lu/stm32f4-bluenrg.git
+  #+END_EXAMPLE
+
+  Build the project:
+  #+BEGIN_EXAMPLE
+    make clean
     make
     make flash
   #+END_EXAMPLE
 
   Start the BlueNRG app and connect.
 
-  Demo video (TBC)
+  [[http://youtu.be/snkItabFmWU][Demo video on YouTube]].
