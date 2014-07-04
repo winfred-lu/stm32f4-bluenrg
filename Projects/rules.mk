@@ -15,7 +15,6 @@ CFLAGS += -Wall
 # Cortex-M4 implements the ARMv7E-M architecture
 CFLAGS += -mcpu=cortex-m4 -march=armv7e-m -mtune=cortex-m4
 CFLAGS += -mlittle-endian -mthumb
-CFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=hard
 
 # C libraries
 define get_library_path

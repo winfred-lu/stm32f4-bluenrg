@@ -9,6 +9,9 @@ ADIO_CFLAGS = -DSTM32F401xC -I$(ADIO_DIR)/Inc \
 	-I$(ROOT_DIR)/Middlewares/Third_Party/FatFs/src \
 	-I$(ROOT_DIR)/Middlewares/Third_Party/FatFs/src/drivers
 
+# Enable hardware FPU
+ADIO_CFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=hard
+
 ADIO_OBJS = \
 	$(ROOT_DIR)/Drivers/BSP/STM32F401-Discovery/stm32f401_discovery.o \
 	$(ROOT_DIR)/Drivers/BSP/STM32F401-Discovery/stm32f401_discovery_accelerometer.o \
