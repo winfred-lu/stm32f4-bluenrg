@@ -1,9 +1,21 @@
 * Introduction
-  [[https://github.com/winfred-lu/stm32f4-bluenrg][stm32f4-bluenrg]] is a sensor demo project for STM32F401 Discovery board in conjunction with a BlueNRG module.
+  There are 2 (currently) projects in [[https://github.com/winfred-lu/stm32f4-bluenrg][stm32f4-bluenrg]] that can be run on [[http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/LN1199/PF259098icmp%3Dstm32f401discovery_pron_footer_jan2014&sc%3Dstm32f401discovery][32F401CDiscovery]] boards.
 
-  The BlueNRG app allows you to access the sensor data directly from the mobile device over Bluetooth Low Energy.
+** Sensor project
+   A sensor demo project for STM32F401 Discovery board in conjunction with a BlueNRG module.
 
-  The STM32F401 Discovery creates a GATT (Generic Attribute Profile) vendor characteristic, and several services including the one reporting Accelerometer data. The mobile phone (BlueNRG app) connecting the board, aquires Accelerometer data, and visualizes it with a 3D cube.
+   The BlueNRG app allows you to access the sensor data directly from the mobile device over Bluetooth Low Energy.
+
+   The STM32F401 Discovery creates a GATT (Generic Attribute Profile) vendor characteristic, and several services including the one reporting Accelerometer data. The mobile phone (BlueNRG app) connecting the board, aquires Accelerometer data, and visualizes it with a 3D cube.
+
+** Audio playback and record
+   This projects shows the usages of the Audio DAC [[http://www.cirrus.com/en/products/cs43l22.html][CS43L22]] and ST MEMS microphone [[http://www.st.com/web/catalog/sense_power/FM125/SC1564/PF251680sc%3Dinternet/analog/product/251680.jsp][MP45DT02]]. User can switch between to play or record an audio by pressing USER button.
+
+   1. Play an audio. Device CS43L22
+      By default, it plays "audio.wav" that is on the USB Mass Storage (LED6 toggle). A click on the board pauses the audio playing(LED6 on ).
+
+   2. Record and play an audio. Device MP45DT02
+      After the USER button is pressed, it starts recording in the USB Mass Storage (LED3 toggle). When the recorded wave length is around 30 seconds or interrupted by pressing the USER button.
 
 * Requirements
 ** Hardware
@@ -41,4 +53,6 @@
 
   Start the BlueNRG app and connect.
 
-  [[http://youtu.be/snkItabFmWU][Demo video on YouTube]].
+** Demo video
+   - [[http://youtu.be/snkItabFmWU][Sensor project demo]]
+   - [[http://youtu.be/cFi-fe3H9fs][Audio project demo]]
